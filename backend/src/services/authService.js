@@ -10,70 +10,85 @@ import { sendVerificationEmail, sendPasswordResetEmail } from './emailService.js
  * @param {object} userData 
  */
 export const register = async (userData) => {
-  const {
-    name,
-    email,
-    password,
-    role,
-    phone,
-    companyName,
-    // Worker specific optional parameters
-    skill,
-    experience,
-    location,
-    availability,
-    expectedDailyWage,
-    aboutMe,
-    avatarUrl,
-    portfolioUrl,
-  } = userData;
+  try {
+    console.log(`[AUTH] Registration request received`);
+    
+    const {
+      name,
+      email,
+      password,
+      role,
+      phone,
+      companyName,
+      // Worker specific optional parameters
+      skill,
+      experience,
+      location,
+      availability,
+      expectedDailyWage,
+      aboutMe,
+      avatarUrl,
+      portfolioUrl,
+    } = userData;
 
-  const existingUser = await userRepository.findByEmail(email);
-  if (existingUser) {
-    const error = new Error('Email address is already in use.');
-    error.statusCode = 400;
+    console.log('[AUTH] Validation successful');
+    
+    const existingUser = await userRepository.findByEmail(email);
+    if (existingUser) {
+      console.log(`[AUTH] Registration failed: Email ${email} is already in use`);
+      const error = new Error('Email address is already in use.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const userId = uuidv4();
+    const passwordHash = await hashPassword(password);
+    console.log('[AUTH] Password hashed');
+    
+    const verificationToken = uuidv4();
+
+    const userRecord = {
+      id: userId,
+      name,
+      email,
+      passwordHash,
+      role,
+      phone,
+      companyName: role === 'Contractor' ? companyName : null,
+      isVerified: false,
+      verificationToken,
+    };
+
+    console.log('[AUTH] Inserting user into PostgreSQL...');
+    const createdUser = await userRepository.create(userRecord);
+    console.log('[AUTH] User created successfully');
+
+    // If role is Worker, instantiate a worker profile
+    if (role === 'Worker') {
+      const workerProfile = {
+        userId,
+        skill: skill || 'General Labor',
+        experience: experience || 'Entry level',
+        location: location || 'Not Specified',
+        availability: availability || 'Available',
+        expectedDailyWage: expectedDailyWage ? parseFloat(expectedDailyWage) : null,
+        aboutMe: aboutMe || null,
+        avatarUrl: avatarUrl || null,
+        portfolioUrl: portfolioUrl || null,
+      };
+      await userRepository.createWorkerProfile(workerProfile);
+    }
+
+    // Fire-and-forget verification email dispatch
+    sendVerificationEmail(email, name, verificationToken)
+      .catch((err) => console.error('Verification email dispatch failed during signup:', err.message));
+
+    console.log('[AUTH] Registration completed');
+    return createdUser;
+  } catch (error) {
+    console.error(`[AUTH] Registration failed: ${error.message}`);
     throw error;
   }
-
-  const userId = uuidv4();
-  const passwordHash = await hashPassword(password);
-  const verificationToken = uuidv4();
-
-  const userRecord = {
-    id: userId,
-    name,
-    email,
-    passwordHash,
-    role,
-    phone,
-    companyName: role === 'Contractor' ? companyName : null,
-    isVerified: 0,
-    verificationToken,
-  };
-
-  const createdUser = await userRepository.create(userRecord);
-
-  // If role is Worker, instantiate a worker profile
-  if (role === 'Worker') {
-    const workerProfile = {
-      userId,
-      skill: skill || 'General Labor',
-      experience: experience || 'Entry level',
-      location: location || 'Not Specified',
-      availability: availability || 'Available',
-      expectedDailyWage: expectedDailyWage ? parseFloat(expectedDailyWage) : null,
-      aboutMe: aboutMe || null,
-      avatarUrl: avatarUrl || null,
-      portfolioUrl: portfolioUrl || null,
-    };
-    await userRepository.createWorkerProfile(workerProfile);
-  }
-
-  // Fire-and-forget verification email dispatch
-  sendVerificationEmail(email, name, verificationToken)
-    .catch((err) => console.error('Verification email dispatch failed during signup:', err.message));
-
-  return createdUser;
 };
 
 /**

@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:5000/api/auth';
 
 // Helper to get initial state from localStorage
 const getLocalStorage = (key, defaultValue) => {
@@ -19,111 +22,60 @@ const setLocalStorage = (key, value) => {
   }
 };
 
-export const useAuthStore = create((set, get) => ({
+export const useAuthStore = create((set) => ({
   user: getLocalStorage('buildflow_current_user', null),
-  users: getLocalStorage('buildflow_users', []),
+  accessToken: getLocalStorage('buildflow_access_token', null),
   isLoading: false,
   error: null,
 
   login: async (email, password) => {
     set({ isLoading: true, error: null });
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    const users = get().users;
-    const foundUser = users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
-
-    if (foundUser) {
-      // Remove password for security in active session
-      const { password: _, ...sessionUser } = foundUser;
-      set({ user: sessionUser, isLoading: false, error: null });
-      setLocalStorage('buildflow_current_user', sessionUser);
+    try {
+      const response = await axios.post(`${API_URL}/login`, { email, password });
+      const { user, tokens } = response.data.data;
+      
+      set({ user, accessToken: tokens.accessToken, isLoading: false, error: null });
+      setLocalStorage('buildflow_current_user', user);
+      setLocalStorage('buildflow_access_token', tokens.accessToken);
+      
       return { success: true };
-    } else {
-      const defaultMatch = email.toLowerCase() === 'admin@buildflow.io' && password === 'Password123';
-      if (defaultMatch) {
-        const adminUser = {
-          name: 'Anand Mehta',
-          email: 'admin@buildflow.io',
-          role: 'Contractor',
-          companyName: 'Mehta & Co',
-        };
-        set({ user: adminUser, isLoading: false, error: null });
-        setLocalStorage('buildflow_current_user', adminUser);
-        return { success: true };
-      }
-      set({ isLoading: false, error: 'Invalid email or password' });
-      return { success: false, error: 'Invalid email or password' };
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || err.message || 'Login failed';
+      set({ isLoading: false, error: errorMsg });
+      return { success: false, error: errorMsg };
     }
   },
 
   register: async (userData) => {
     set({ isLoading: true, error: null });
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    const users = get().users;
-    const emailExists = users.some(
-      (u) => u.email.toLowerCase() === userData.email.toLowerCase()
-    ) || userData.email.toLowerCase() === 'admin@buildflow.io';
-
-    if (emailExists) {
-      set({ isLoading: false, error: 'Email address is already registered' });
-      return { success: false, error: 'Email address is already registered' };
+    try {
+      await axios.post(`${API_URL}/register`, userData);
+      
+      set({ isLoading: false, error: null });
+      return { success: true };
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || 'Registration failed';
+      set({ isLoading: false, error: errorMsg });
+      return { success: false, error: errorMsg };
     }
-
-    const newUser = {
-      ...userData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-    };
-
-    const updatedUsers = [...users, newUser];
-    set({ users: updatedUsers, isLoading: false, error: null });
-    setLocalStorage('buildflow_users', updatedUsers);
-
-    // Auto-login after registration
-    const { password: _, ...sessionUser } = newUser;
-    set({ user: sessionUser });
-    setLocalStorage('buildflow_current_user', sessionUser);
-
-    return { success: true };
   },
 
   logout: () => {
-    set({ user: null, error: null });
+    set({ user: null, accessToken: null, error: null });
     localStorage.removeItem('buildflow_current_user');
+    localStorage.removeItem('buildflow_access_token');
   },
 
   resetPassword: async (email, newPassword) => {
     set({ isLoading: true, error: null });
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    const users = get().users;
-    const userIndex = users.findIndex(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (userIndex !== -1) {
-      const updatedUsers = [...users];
-      updatedUsers[userIndex] = {
-        ...updatedUsers[userIndex],
-        password: newPassword,
-      };
-      set({ users: updatedUsers, isLoading: false });
-      setLocalStorage('buildflow_users', updatedUsers);
-      return { success: true };
+    try {
+      // For now, if the user tries to reset directly
+      set({ isLoading: false, error: 'Password reset requires an email link for security.' });
+      return { success: false, error: 'Password reset requires an email link.' };
+    } catch (err) {
+      set({ isLoading: false, error: 'Reset failed' });
+      return { success: false, error: 'Reset failed' };
     }
-
-    // Default admin mock reset
-    if (email.toLowerCase() === 'admin@buildflow.io') {
-      set({ isLoading: false });
-      return { success: true };
-    }
-
-    set({ isLoading: false, error: 'Email not found' });
-    return { success: false, error: 'Email not found' };
   },
 
   clearError: () => set({ error: null }),

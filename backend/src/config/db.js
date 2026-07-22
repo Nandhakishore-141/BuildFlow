@@ -18,13 +18,4 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
 });
 
-// Immediately test query to confirm DB configuration validity
-pool.query('SELECT 1')
-  .then(() => {
-    console.log('PostgreSQL Database pool established and active.');
-  })
-  .catch((err) => {
-    console.error('CRITICAL: Failed to query PostgreSQL Database on startup:', err.message);
-  });
-
 export default pool;

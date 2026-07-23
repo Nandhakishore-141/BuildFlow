@@ -1,57 +1,90 @@
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SectionCard } from '@/components/common/SectionCard';
+import { EmptyState } from '@/components/common/EmptyState';
 import { TimelinePlaceholder } from '@/components/common/TimelinePlaceholder';
 import { GalleryPlaceholder } from '@/components/common/GalleryPlaceholder';
 import { Button } from '@/components/common/Button';
-import { CheckCircle } from 'lucide-react';
+import { Camera, AlertCircle } from 'lucide-react';
+import * as progressService from '@/services/progressService';
 
 export const ContractorProgress = () => {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await progressService.getProgress();
+        setData(res.data || {});
+      } catch (err) {
+        if (err.response && err.response.status === 404) setError('404');
+        else setError('Failed to load progress.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="space-y-6">
       <PageHeader 
-        title="Progress Reviews" 
-        description="Review updates from your workers and share progress with homeowners."
+        title="Progress & Photos" 
+        description="Review site photos and track phase completions."
+        action={
+          <Button variant="primary" className="gap-2">
+            <Camera className="w-4 h-4" />
+            Upload Photos
+          </Button>
+        }
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <SectionCard>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-neutral-900 tracking-tight">Recent Photo Uploads</h2>
-              <select className="px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500">
-                <option value="all">All Projects</option>
-              </select>
-            </div>
-            <GalleryPlaceholder count={8} />
+            <h2 className="text-lg font-bold text-neutral-900 tracking-tight mb-4">Recent Uploads</h2>
+            {isLoading ? (
+              <GalleryPlaceholder count={6} />
+            ) : error === '404' ? (
+              <EmptyState 
+                icon={AlertCircle}
+                title="Feature Not Yet Connected"
+                description="The backend endpoint for Progress (/api/progress) is not yet implemented."
+              />
+            ) : error ? (
+              <div className="text-center py-8 text-red-500 font-medium">{error}</div>
+            ) : !data?.photos?.length ? (
+              <EmptyState 
+                icon={Camera}
+                title="No photos found"
+                description="No progress photos have been uploaded yet."
+              />
+            ) : (
+              <div>{/* Render real photos here */}</div>
+            )}
           </SectionCard>
         </div>
-
+        
         <div className="space-y-6">
           <SectionCard>
-            <h2 className="text-lg font-bold text-neutral-900 tracking-tight mb-4">Pending Approvals</h2>
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl border border-gold-200 bg-gold-50">
-                <p className="font-semibold text-gold-900 text-sm">Foundation Poured</p>
-                <p className="text-xs text-gold-700 mt-1">Uploaded by Mike Smith • 2h ago</p>
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" className="w-full text-xs bg-gold-600 hover:bg-gold-700 text-white border-0">Approve</Button>
-                  <Button variant="outline" size="sm" className="w-full text-xs">Reject</Button>
-                </div>
-              </div>
-              <div className="p-4 rounded-xl border border-gold-200 bg-gold-50">
-                <p className="font-semibold text-gold-900 text-sm">Drywall Installation</p>
-                <p className="text-xs text-gold-700 mt-1">Uploaded by Sarah Jones • 5h ago</p>
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" className="w-full text-xs bg-gold-600 hover:bg-gold-700 text-white border-0">Approve</Button>
-                  <Button variant="outline" size="sm" className="w-full text-xs">Reject</Button>
-                </div>
-              </div>
-            </div>
-          </SectionCard>
-
-          <SectionCard>
             <h2 className="text-lg font-bold text-neutral-900 tracking-tight mb-4">Project Timeline</h2>
-            <TimelinePlaceholder items={4} />
+            {isLoading ? (
+              <TimelinePlaceholder steps={5} />
+            ) : error === '404' ? (
+              <EmptyState 
+                icon={AlertCircle}
+                title="Pending Backend"
+                description="Timeline feature requires backend API."
+              />
+            ) : error ? (
+              <div className="text-center py-4 text-red-500 text-sm font-medium">{error}</div>
+            ) : !data?.timeline?.length ? (
+              <p className="text-sm text-neutral-500">No timeline data available.</p>
+            ) : (
+              <div>{/* Render timeline here */}</div>
+            )}
           </SectionCard>
         </div>
       </div>

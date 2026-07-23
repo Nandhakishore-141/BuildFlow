@@ -1,42 +1,59 @@
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SectionCard } from '@/components/common/SectionCard';
-import { Bell, BellOff } from 'lucide-react';
-import { Button } from '@/components/common/Button';
+import { EmptyState } from '@/components/common/EmptyState';
+import { Bell, AlertCircle } from 'lucide-react';
+import * as notificationService from '@/services/notificationService';
 
 export const WorkerNotifications = () => {
+  const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await notificationService.getNotifications();
+        setNotifications(res.data?.notifications || []);
+      } catch (err) {
+        if (err.response && err.response.status === 404) setError('404');
+        else setError('Failed to load notifications.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="space-y-6">
       <PageHeader 
         title="Notifications" 
-        description="View your alerts, updates, and messages from supervisors."
-        action={
-          <Button variant="outline" className="gap-2">
-            <BellOff className="w-4 h-4" />
-            Mark all as read
-          </Button>
-        }
+        description="View project updates and messages from your supervisor."
       />
 
-      <SectionCard noPadding>
-        <div className="border-b border-neutral-200">
-          <div className="flex space-x-8 px-6">
-            <button className="py-4 text-sm font-medium text-gold-600 border-b-2 border-gold-600">Unread (1)</button>
-            <button className="py-4 text-sm font-medium text-neutral-500 hover:text-neutral-700">All Notifications</button>
+      <SectionCard>
+        {isLoading ? (
+          <div className="p-8 text-center text-neutral-500 animate-pulse">Loading notifications...</div>
+        ) : error === '404' ? (
+          <EmptyState 
+            icon={AlertCircle}
+            title="Feature Not Yet Connected"
+            description="The backend endpoint for Notifications (/api/notifications) is not yet implemented."
+          />
+        ) : error ? (
+          <div className="text-center py-8 text-red-500 font-medium">{error}</div>
+        ) : notifications.length === 0 ? (
+          <EmptyState 
+            icon={Bell}
+            title="You're all caught up"
+            description="There are no new notifications at this time."
+          />
+        ) : (
+          <div className="divide-y divide-neutral-100">
+            {/* Render real notifications here */}
           </div>
-        </div>
-
-        <div className="divide-y divide-neutral-100">
-          <div className="p-6 bg-gold-50/50 hover:bg-neutral-50 transition-colors flex gap-4">
-            <div className="w-10 h-10 rounded-full bg-gold-100 flex items-center justify-center text-gold-600 shrink-0">
-              <Bell className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-neutral-900">Task Assigned</p>
-              <p className="text-sm text-neutral-600 mt-1">You have been assigned a new task: "Complete safety briefing".</p>
-              <p className="text-xs text-neutral-400 mt-2">2 hours ago</p>
-            </div>
-          </div>
-        </div>
+        )}
       </SectionCard>
     </div>
   );

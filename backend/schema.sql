@@ -95,22 +95,32 @@ EXECUTE PROCEDURE trigger_set_timestamp();
 -- 3. Projects Table
 CREATE TABLE projects (
   id VARCHAR(36) NOT NULL PRIMARY KEY,
-  contractor_id VARCHAR(36) NOT NULL,
-  homeowner_id VARCHAR(36) NULL,
-  title VARCHAR(150) NOT NULL,
+  project_name VARCHAR(150) NOT NULL,
+  project_code VARCHAR(50) NOT NULL UNIQUE,
   description TEXT NULL,
-  location VARCHAR(255) NOT NULL,
+  owner_id VARCHAR(36) NULL,
+  contractor_id VARCHAR(36) NOT NULL,
   status project_status NOT NULL DEFAULT 'Planning',
-  start_date DATE NULL,
-  end_date DATE NULL,
+  planned_start_date DATE NULL,
+  planned_end_date DATE NULL,
+  actual_start_date DATE NULL,
+  actual_end_date DATE NULL,
   budget DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+  address VARCHAR(255) NULL,
+  city VARCHAR(100) NULL,
+  state VARCHAR(100) NULL,
+  country VARCHAR(100) NULL,
+  latitude DECIMAL(10,8) NULL,
+  longitude DECIMAL(11,8) NULL,
+  completion_percentage DECIMAL(5,2) NOT NULL DEFAULT 0.00,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_projects_contractor FOREIGN KEY (contractor_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_projects_homeowner FOREIGN KEY (homeowner_id) REFERENCES users (id) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT fk_projects_owner FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 CREATE INDEX idx_projects_contractor ON projects(contractor_id);
-CREATE INDEX idx_projects_homeowner ON projects(homeowner_id);
+CREATE INDEX idx_projects_owner ON projects(owner_id);
+CREATE INDEX idx_projects_code ON projects(project_code);
 
 CREATE TRIGGER set_timestamp_projects
 BEFORE UPDATE ON projects

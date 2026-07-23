@@ -1,40 +1,58 @@
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SectionCard } from '@/components/common/SectionCard';
-import { StatCard } from '@/components/common/StatCard';
+import { EmptyState } from '@/components/common/EmptyState';
 import { TablePlaceholder } from '@/components/common/TablePlaceholder';
-import { Button } from '@/components/common/Button';
-import { CreditCard, Download } from 'lucide-react';
+import { Receipt, AlertCircle } from 'lucide-react';
+import * as expenseService from '@/services/expenseService';
 
 export const HomeownerExpenses = () => {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await expenseService.getExpenses();
+        setData(res.data || {});
+      } catch (err) {
+        if (err.response && err.response.status === 404) setError('404');
+        else setError('Failed to load financials.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="space-y-6">
       <PageHeader 
-        title="Financials & Payments" 
-        description="Track your budget, view invoices, and manage payments."
-        action={
-          <Button variant="outline" className="gap-2">
-            <Download className="w-4 h-4" />
-            Download Summary
-          </Button>
-        }
+        title="Financials" 
+        description="Review invoices and budget summaries provided by your contractor."
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatCard title="Total Budget" value="$450,000" color="neutral" />
-        <StatCard title="Amount Paid" value="$125,400" color="green" />
-        <StatCard title="Next Payment Due" value="$25,000" color="red" />
-      </div>
-
       <SectionCard>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-neutral-900 tracking-tight">Payment History & Invoices</h2>
-          <Button variant="primary" size="sm" className="gap-2">
-            <CreditCard className="w-4 h-4" />
-            Make Payment
-          </Button>
-        </div>
-
-        <TablePlaceholder columns={5} rows={5} />
+        {isLoading ? (
+          <TablePlaceholder columns={4} rows={5} />
+        ) : error === '404' ? (
+          <EmptyState 
+            icon={AlertCircle}
+            title="Feature Not Yet Connected"
+            description="The backend endpoint for Expenses (/api/expenses) is not yet implemented."
+          />
+        ) : error ? (
+          <div className="text-center py-8 text-red-500 font-medium">{error}</div>
+        ) : !data?.invoices?.length ? (
+          <EmptyState 
+            icon={Receipt}
+            title="No invoices found"
+            description="There are no financials available for your projects."
+          />
+        ) : (
+          <div>{/* Render real invoices here */}</div>
+        )}
       </SectionCard>
     </div>
   );

@@ -1,47 +1,66 @@
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SectionCard } from '@/components/common/SectionCard';
 import { EmptyState } from '@/components/common/EmptyState';
-import { FileText, Download } from 'lucide-react';
 import { Button } from '@/components/common/Button';
+import { BarChart2, Download, AlertCircle } from 'lucide-react';
+import * as reportService from '@/services/reportService';
 
 export const ContractorReports = () => {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await reportService.getReports();
+        setData(res.data || {});
+      } catch (err) {
+        if (err.response && err.response.status === 404) setError('404');
+        else setError('Failed to load reports.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="space-y-6">
       <PageHeader 
         title="Reports & Analytics" 
-        description="Generate comprehensive reports for your projects, financials, and workforce."
+        description="Generate comprehensive reports on budget, timeline, and workforce."
         action={
           <Button variant="primary" className="gap-2">
             <Download className="w-4 h-4" />
-            Export All Data
+            Generate New Report
           </Button>
         }
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <SectionCard>
-          <h2 className="text-lg font-bold text-neutral-900 tracking-tight mb-4">Financial Overview</h2>
-          <div className="h-64 bg-neutral-50 rounded-lg border border-dashed border-neutral-300 flex items-center justify-center">
-            <p className="text-neutral-400 font-medium">Financial Chart Placeholder</p>
-          </div>
-        </SectionCard>
-
-        <SectionCard>
-          <h2 className="text-lg font-bold text-neutral-900 tracking-tight mb-4">Workforce Productivity</h2>
-          <div className="h-64 bg-neutral-50 rounded-lg border border-dashed border-neutral-300 flex items-center justify-center">
-            <p className="text-neutral-400 font-medium">Productivity Graph Placeholder</p>
-          </div>
-        </SectionCard>
-      </div>
-
       <SectionCard>
-        <h2 className="text-lg font-bold text-neutral-900 tracking-tight mb-4">Generated Reports</h2>
-        <EmptyState 
-          icon={FileText}
-          title="No reports generated yet"
-          description="Select a project and date range to generate a new report."
-          action={<Button variant="outline">Generate Report</Button>}
-        />
+        {isLoading ? (
+          <div className="h-64 flex items-center justify-center bg-neutral-50 rounded-lg animate-pulse">
+            <p className="text-neutral-400 font-medium">Loading analytics...</p>
+          </div>
+        ) : error === '404' ? (
+          <EmptyState 
+            icon={AlertCircle}
+            title="Feature Not Yet Connected"
+            description="The backend endpoint for Reports (/api/reports) is not yet implemented."
+          />
+        ) : error ? (
+          <div className="text-center py-8 text-red-500 font-medium">{error}</div>
+        ) : !data?.reports?.length ? (
+          <EmptyState 
+            icon={BarChart2}
+            title="No reports generated"
+            description="You haven't generated any reports yet."
+          />
+        ) : (
+          <div>{/* Render real charts here */}</div>
+        )}
       </SectionCard>
     </div>
   );

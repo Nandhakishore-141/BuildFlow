@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import authRoutes from './routes/authRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -33,6 +34,7 @@ app.get('/health', (req, res) => {
 
 // App Router Declarations
 app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
 
 // Unhandled Endpoint Route Catch (404)
 app.use((req, res, next) => {

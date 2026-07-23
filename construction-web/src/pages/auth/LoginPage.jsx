@@ -47,8 +47,12 @@ export function LoginPage() {
     if (result.success) {
       setSuccessMsg('Successfully logged in! Redirecting...');
       setTimeout(() => {
-        // Redirection to landing page or dashboard mockup (landing page for now)
-        navigate('/');
+        const user = useAuthStore.getState().user;
+        if (user?.role === 'Admin') navigate('/admin/dashboard');
+        else if (user?.role === 'Contractor') navigate('/contractor/dashboard');
+        else if (user?.role === 'Worker') navigate('/worker/dashboard');
+        else if (user?.role === 'Homeowner') navigate('/homeowner/dashboard');
+        else navigate('/');
       }, 1200);
     }
   };
@@ -123,13 +127,6 @@ export function LoginPage() {
             </AuthButton>
           </div>
 
-          {/* Helper details for mock authentication */}
-          <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/50 text-[10px] text-neutral-500 space-y-1">
-            <p className="font-semibold text-neutral-700">💡 Quick Mock Access:</p>
-            <p>• Email: <span className="font-mono text-neutral-800">admin@buildflow.io</span></p>
-            <p>• Password: <span className="font-mono text-neutral-800">Password123</span></p>
-            <p>• Or, register a new account to test persistent login.</p>
-          </div>
 
           <div className="relative flex items-center justify-center my-6">
             <div className="absolute inset-x-0 h-px bg-neutral-200" />

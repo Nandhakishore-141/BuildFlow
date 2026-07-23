@@ -13,8 +13,26 @@ import {
   Settings, 
   UserCircle,
   Upload,
-  CalendarCheck
+  CalendarCheck,
+  Activity,
+  Megaphone,
+  ShieldAlert
 } from 'lucide-react';
+
+const adminLinks = [
+  { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+  { name: 'Users', path: '/admin/users', icon: Users },
+  { name: 'Contractors', path: '/admin/contractors', icon: Briefcase },
+  { name: 'Homeowners', path: '/admin/homeowners', icon: UserCircle },
+  { name: 'Workers', path: '/admin/workers', icon: Users },
+  { name: 'Projects', path: '/admin/projects', icon: Briefcase },
+  { name: 'Reports', path: '/admin/reports', icon: FileText },
+  { name: 'Analytics', path: '/admin/analytics', icon: Activity },
+  { name: 'Announcements', path: '/admin/announcements', icon: Megaphone },
+  { name: 'Audit Logs', path: '/admin/audit-logs', icon: ShieldAlert },
+  { name: 'Notifications', path: '/admin/notifications', icon: Bell },
+  { name: 'Settings', path: '/admin/settings', icon: Settings },
+];
 
 const contractorLinks = [
   { name: 'Dashboard', path: '/contractor/dashboard', icon: LayoutDashboard },
@@ -54,7 +72,8 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
 
   let links = [];
-  if (user?.role === 'Contractor') links = contractorLinks;
+  if (user?.role === 'Admin') links = adminLinks;
+  else if (user?.role === 'Contractor') links = contractorLinks;
   else if (user?.role === 'Homeowner') links = homeownerLinks;
   else if (user?.role === 'Worker') links = workerLinks;
 

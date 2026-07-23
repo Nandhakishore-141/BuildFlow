@@ -296,3 +296,35 @@ CREATE TABLE refresh_tokens (
   CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE INDEX idx_tokens_user ON refresh_tokens(user_id);
+
+-- 14. Announcements Table
+CREATE TABLE announcements (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  priority VARCHAR(50) NOT NULL DEFAULT 'Normal',
+  target_role VARCHAR(50) NOT NULL DEFAULT 'Everyone',
+  publish_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  expiry_date TIMESTAMP NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER set_timestamp_announcements
+BEFORE UPDATE ON announcements
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+-- 15. Audit Logs Table
+CREATE TABLE audit_logs (
+  id SERIAL PRIMARY KEY,
+  user_id VARCHAR(36) NULL,
+  action VARCHAR(150) NOT NULL,
+  details TEXT NULL,
+  ip_address VARCHAR(50) NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_audit_logs_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+CREATE INDEX idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX idx_audit_logs_user ON audit_logs(user_id);
+

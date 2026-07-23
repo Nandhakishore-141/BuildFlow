@@ -48,6 +48,19 @@ import { WorkerNotifications } from './pages/worker/WorkerNotifications';
 import { WorkerSettings } from './pages/worker/WorkerSettings';
 import { WorkerProfileCompletion } from './pages/worker/WorkerProfileCompletion';
 
+import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { AdminUsers } from './pages/admin/AdminUsers';
+import { AdminContractors } from './pages/admin/AdminContractors';
+import { AdminHomeowners } from './pages/admin/AdminHomeowners';
+import { AdminWorkers } from './pages/admin/AdminWorkers';
+import { AdminProjects } from './pages/admin/AdminProjects';
+import { AdminReports } from './pages/admin/AdminReports';
+import { AdminAnalytics } from './pages/admin/AdminAnalytics';
+import { AdminAnnouncements } from './pages/admin/AdminAnnouncements';
+import { AdminAuditLogs } from './pages/admin/AdminAuditLogs';
+import { AdminNotifications } from './pages/admin/AdminNotifications';
+import { AdminSettings } from './pages/admin/AdminSettings';
+
 function App() {
   const { initializeAuth } = useAuthStore();
 
@@ -82,6 +95,23 @@ function App() {
           {/* Shared Dashboard Layout */}
           <Route element={<DashboardLayout />}>
             
+            {/* Admin Routes */}
+            <Route element={<RoleRoute allowedRoles={['Admin']} />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/contractors" element={<AdminContractors />} />
+              <Route path="/admin/homeowners" element={<AdminHomeowners />} />
+              <Route path="/admin/workers" element={<AdminWorkers />} />
+              <Route path="/admin/projects" element={<AdminProjects />} />
+              <Route path="/admin/reports" element={<AdminReports />} />
+              <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/announcements" element={<AdminAnnouncements />} />
+              <Route path="/admin/audit-logs" element={<AdminAuditLogs />} />
+              <Route path="/admin/notifications" element={<AdminNotifications />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
+              <Route path="/admin/*" element={<AdminDashboard />} />
+            </Route>
+
             {/* Contractor Routes */}
             <Route element={<RoleRoute allowedRoles={['Contractor']} />}>
               <Route path="/contractor/dashboard" element={<ContractorDashboard />} />

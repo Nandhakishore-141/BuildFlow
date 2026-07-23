@@ -9,7 +9,7 @@ export const PublicRoute = () => {
     // If a user is somehow authenticated but has an invalid role, forcefully log them out
     // to prevent getting stuck in a redirect loop.
     if (isInitialized && accessToken && user) {
-      if (!['Contractor', 'Homeowner', 'Worker'].includes(user.role)) {
+      if (!['Contractor', 'Homeowner', 'Worker', 'Admin'].includes(user.role)) {
         logout();
       }
     }
@@ -25,6 +25,7 @@ export const PublicRoute = () => {
   }
 
   if (accessToken && user) {
+    if (user.role === 'Admin') return <Navigate to="/admin/dashboard" replace />;
     if (user.role === 'Contractor') return <Navigate to="/contractor/dashboard" replace />;
     if (user.role === 'Homeowner') return <Navigate to="/homeowner/dashboard" replace />;
     if (user.role === 'Worker') return <Navigate to="/worker/dashboard" replace />;

@@ -22,11 +22,45 @@ const setLocalStorage = (key, value) => {
   }
 };
 
-export const useAuthStore = create((set) => ({
+// Request interceptor to attach JWT token to every axios request
+axios.interceptors.request.use(
+  (config) => {
+    const token = getLocalStorage('buildflow_access_token', null);
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+export const useAuthStore = create((set, get) => ({
   user: getLocalStorage('buildflow_current_user', null),
   accessToken: getLocalStorage('buildflow_access_token', null),
   isLoading: false,
+  isInitialized: false,
   error: null,
+
+  initializeAuth: async () => {
+    const token = get().accessToken;
+    if (!token) {
+      set({ isInitialized: true, user: null, accessToken: null });
+      return;
+    }
+    
+    set({ isLoading: true });
+    try {
+      const response = await axios.get(`${API_URL}/me`);
+      const user = response.data.data.user;
+      set({ user, isInitialized: true, isLoading: false });
+      setLocalStorage('buildflow_current_user', user);
+    } catch (error) {
+      console.error('Session expired or invalid token');
+      set({ user: null, accessToken: null, isInitialized: true, isLoading: false });
+      localStorage.removeItem('buildflow_current_user');
+      localStorage.removeItem('buildflow_access_token');
+    }
+  },
 
   login: async (email, password) => {
     set({ isLoading: true, error: null });
@@ -61,15 +95,17 @@ export const useAuthStore = create((set) => ({
   },
 
   logout: () => {
-    set({ user: null, accessToken: null, error: null });
     localStorage.removeItem('buildflow_current_user');
     localStorage.removeItem('buildflow_access_token');
+    if (axios.defaults.headers.common['Authorization']) {
+      delete axios.defaults.headers.common['Authorization'];
+    }
+    set({ user: null, accessToken: null, error: null });
   },
 
   resetPassword: async (email, newPassword) => {
     set({ isLoading: true, error: null });
     try {
-      // For now, if the user tries to reset directly
       set({ isLoading: false, error: 'Password reset requires an email link for security.' });
       return { success: false, error: 'Password reset requires an email link.' };
     } catch (err) {

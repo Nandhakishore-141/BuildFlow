@@ -16,7 +16,7 @@ export function Navbar() {
   const handleLogout = () => {
     logout();
     setIsMobileMenuOpen(false);
-    navigate('/');
+    navigate('/login');
   };
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export function Navbar() {
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2.5 group">
+          <Link to="/" className="flex items-center gap-2.5 group">
             <div className="flex items-center justify-center w-8 h-8 rounded-lg gradient-gold">
               <svg
                 width="18"
@@ -68,7 +68,7 @@ export function Navbar() {
             <span className="text-lg font-bold text-neutral-900 tracking-tight">
               Build<span className="gradient-gold-text">Flow</span>
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">

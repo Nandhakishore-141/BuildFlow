@@ -269,3 +269,19 @@ export const verifyEmail = async (token) => {
 
   return { success: true };
 };
+
+/**
+ * Get the full user profile safely
+ * @param {string} userId 
+ */
+export const getUserProfile = async (userId) => {
+  const user = await userRepository.findById(userId);
+  if (!user) {
+    const error = new Error('User not found.');
+    error.statusCode = 404;
+    throw error;
+  }
+  
+  const { password_hash: _, verification_token: __, reset_token: ___, reset_token_expires: ____, ...profile } = user;
+  return profile;
+};

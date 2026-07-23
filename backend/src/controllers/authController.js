@@ -99,3 +99,21 @@ export const verifyEmail = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getMe = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    // We could fetch from repository directly or create a service method
+    // authService.getUserProfile(userId) would be better architecture.
+    // For now, let's use the service.
+    const userProfile = await authService.getUserProfile(userId);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user: userProfile,
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};

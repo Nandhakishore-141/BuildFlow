@@ -50,4 +50,12 @@ router.post(
   authController.resetPassword
 );
 
+import { requireAuth } from '../middleware/authMiddleware.js';
+
+router.get(
+  '/me',
+  requireAuth,
+  authController.getMe
+);
+
 export default router;

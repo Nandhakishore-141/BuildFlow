@@ -1,65 +1,67 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useAuthStore } from './store/authStore';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 
-// Public Pages
-import { LandingPage } from './pages/LandingPage';
-import { LoginPage } from './pages/auth/LoginPage';
-import { RegisterEntryPage } from './pages/auth/RegisterEntryPage';
-import { ContractorRegisterPage } from './pages/auth/ContractorRegisterPage';
-import { HomeownerRegisterPage } from './pages/auth/HomeownerRegisterPage';
-import { WorkerRegisterPage } from './pages/auth/WorkerRegisterPage';
-import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
-import { VerifyEmailPage } from './pages/auth/VerifyEmailPage';
-import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
+// Guards & Layouts
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { PublicRoute } from '@/components/auth/PublicRoute';
+import { RoleRoute } from '@/components/auth/RoleRoute';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
-// Layout & Guards
-import { DashboardLayout } from './components/layout/DashboardLayout';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { PublicRoute } from './components/auth/PublicRoute';
-import { RoleRoute } from './components/auth/RoleRoute';
+// Pages
+import { LandingPage } from '@/pages/LandingPage';
+import { LoginPage } from '@/pages/auth/LoginPage';
+import { ContractorRegisterPage } from '@/pages/auth/ContractorRegisterPage';
+import { HomeownerRegisterPage } from '@/pages/auth/HomeownerRegisterPage';
+import { WorkerRegisterPage } from '@/pages/auth/WorkerRegisterPage';
+import { RegisterEntryPage } from '@/pages/auth/RegisterEntryPage';
+import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
+import { VerifyEmailPage } from '@/pages/auth/VerifyEmailPage';
+import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage';
 
-// Dashboards
-import { ContractorDashboard } from './pages/contractor/ContractorDashboard';
-import { ContractorProjects } from './pages/contractor/ContractorProjects';
-import { ContractorWorkers } from './pages/contractor/ContractorWorkers';
-import { ContractorAttendance } from './pages/contractor/ContractorAttendance';
-import { ContractorMaterials } from './pages/contractor/ContractorMaterials';
-import { ContractorExpenses } from './pages/contractor/ContractorExpenses';
-import { ContractorProgress } from './pages/contractor/ContractorProgress';
-import { ContractorReports } from './pages/contractor/ContractorReports';
-import { ContractorNotifications } from './pages/contractor/ContractorNotifications';
-import { ContractorSettings } from './pages/contractor/ContractorSettings';
+import { ContractorDashboard } from '@/pages/contractor/ContractorDashboard';
+import { ContractorProjects } from '@/pages/contractor/ContractorProjects';
+import { ContractorOpportunities } from '@/pages/contractor/ContractorOpportunities';
+import { ContractorWorkers } from '@/pages/contractor/ContractorWorkers';
+import { ContractorAttendance } from '@/pages/contractor/ContractorAttendance';
+import { ContractorMaterials } from '@/pages/contractor/ContractorMaterials';
+import { ContractorExpenses } from '@/pages/contractor/ContractorExpenses';
+import { ContractorProgress } from '@/pages/contractor/ContractorProgress';
+import { ContractorReports } from '@/pages/contractor/ContractorReports';
+import { ContractorNotifications } from '@/pages/contractor/ContractorNotifications';
+import { ContractorSettings } from '@/pages/contractor/ContractorSettings';
 
-import { HomeownerDashboard } from './pages/homeowner/HomeownerDashboard';
-import { HomeownerProjects } from './pages/homeowner/HomeownerProjects';
-import { HomeownerProgress } from './pages/homeowner/HomeownerProgress';
-import { HomeownerExpenses } from './pages/homeowner/HomeownerExpenses';
-import { HomeownerDocuments } from './pages/homeowner/HomeownerDocuments';
-import { HomeownerNotifications } from './pages/homeowner/HomeownerNotifications';
-import { HomeownerSettings } from './pages/homeowner/HomeownerSettings';
+import { HomeownerDashboard } from '@/pages/homeowner/HomeownerDashboard';
+import { HomeownerBuildings, HomeownerProjects } from '@/pages/homeowner/HomeownerProjects';
+import { HomeownerBuildingWorkspace } from '@/pages/homeowner/HomeownerBuildingWorkspace';
+import { HomeownerProgress } from '@/pages/homeowner/HomeownerProgress';
+import { HomeownerExpenses } from '@/pages/homeowner/HomeownerExpenses';
+import { HomeownerDocuments } from '@/pages/homeowner/HomeownerDocuments';
+import { HomeownerNotifications } from '@/pages/homeowner/HomeownerNotifications';
+import { HomeownerSettings } from '@/pages/homeowner/HomeownerSettings';
 
-import { WorkerDashboard } from './pages/worker/WorkerDashboard';
-import { WorkerProfile } from './pages/worker/WorkerProfile';
-import { WorkerProjects } from './pages/worker/WorkerProjects';
-import { WorkerUploadProgress } from './pages/worker/WorkerUploadProgress';
-import { WorkerAttendance } from './pages/worker/WorkerAttendance';
-import { WorkerNotifications } from './pages/worker/WorkerNotifications';
-import { WorkerSettings } from './pages/worker/WorkerSettings';
-import { WorkerProfileCompletion } from './pages/worker/WorkerProfileCompletion';
+import { WorkerDashboard } from '@/pages/worker/WorkerDashboard';
+import { WorkerProfile } from '@/pages/worker/WorkerProfile';
+import { WorkerBuildings, WorkerProjects } from '@/pages/worker/WorkerProjects';
+import { WorkerBuildingWorkspace } from '@/pages/worker/WorkerBuildingWorkspace';
+import { WorkerUploadProgress } from '@/pages/worker/WorkerUploadProgress';
+import { WorkerAttendance } from '@/pages/worker/WorkerAttendance';
+import { WorkerNotifications } from '@/pages/worker/WorkerNotifications';
+import { WorkerSettings } from '@/pages/worker/WorkerSettings';
+import { WorkerProfileCompletion } from '@/pages/worker/WorkerProfileCompletion';
 
-import { AdminDashboard } from './pages/admin/AdminDashboard';
-import { AdminUsers } from './pages/admin/AdminUsers';
-import { AdminContractors } from './pages/admin/AdminContractors';
-import { AdminHomeowners } from './pages/admin/AdminHomeowners';
-import { AdminWorkers } from './pages/admin/AdminWorkers';
-import { AdminProjects } from './pages/admin/AdminProjects';
-import { AdminReports } from './pages/admin/AdminReports';
-import { AdminAnalytics } from './pages/admin/AdminAnalytics';
-import { AdminAnnouncements } from './pages/admin/AdminAnnouncements';
-import { AdminAuditLogs } from './pages/admin/AdminAuditLogs';
-import { AdminNotifications } from './pages/admin/AdminNotifications';
-import { AdminSettings } from './pages/admin/AdminSettings';
+import { AdminDashboard } from '@/pages/admin/AdminDashboard';
+import { AdminUsers } from '@/pages/admin/AdminUsers';
+import { AdminContractors } from '@/pages/admin/AdminContractors';
+import { AdminHomeowners } from '@/pages/admin/AdminHomeowners';
+import { AdminWorkers } from '@/pages/admin/AdminWorkers';
+import { AdminProjects } from '@/pages/admin/AdminProjects';
+import { AdminReports } from '@/pages/admin/AdminReports';
+import { AdminAnalytics } from '@/pages/admin/AdminAnalytics';
+import { AdminAnnouncements } from '@/pages/admin/AdminAnnouncements';
+import { AdminAuditLogs } from '@/pages/admin/AdminAuditLogs';
+import { AdminNotifications } from '@/pages/admin/AdminNotifications';
+import { AdminSettings } from '@/pages/admin/AdminSettings';
 
 function App() {
   const { initializeAuth } = useAuthStore();
@@ -116,6 +118,7 @@ function App() {
             <Route element={<RoleRoute allowedRoles={['Contractor']} />}>
               <Route path="/contractor/dashboard" element={<ContractorDashboard />} />
               <Route path="/contractor/projects" element={<ContractorProjects />} />
+              <Route path="/contractor/opportunities" element={<ContractorOpportunities />} />
               <Route path="/contractor/workers" element={<ContractorWorkers />} />
               <Route path="/contractor/attendance" element={<ContractorAttendance />} />
               <Route path="/contractor/materials" element={<ContractorMaterials />} />
@@ -130,7 +133,10 @@ function App() {
             {/* Homeowner Routes */}
             <Route element={<RoleRoute allowedRoles={['Homeowner']} />}>
               <Route path="/homeowner/dashboard" element={<HomeownerDashboard />} />
+              <Route path="/homeowner/buildings" element={<HomeownerBuildings />} />
+              <Route path="/homeowner/buildings/:id" element={<HomeownerBuildingWorkspace />} />
               <Route path="/homeowner/projects" element={<HomeownerProjects />} />
+              <Route path="/homeowner/projects/:id" element={<HomeownerBuildingWorkspace />} />
               <Route path="/homeowner/progress" element={<HomeownerProgress />} />
               <Route path="/homeowner/expenses" element={<HomeownerExpenses />} />
               <Route path="/homeowner/documents" element={<HomeownerDocuments />} />
@@ -143,6 +149,8 @@ function App() {
             <Route element={<RoleRoute allowedRoles={['Worker']} />}>
               <Route path="/worker/dashboard" element={<WorkerDashboard />} />
               <Route path="/worker/profile" element={<WorkerProfile />} />
+              <Route path="/worker/buildings" element={<WorkerBuildings />} />
+              <Route path="/worker/buildings/:id" element={<WorkerBuildingWorkspace />} />
               <Route path="/worker/projects" element={<WorkerProjects />} />
               <Route path="/worker/upload-progress" element={<WorkerUploadProgress />} />
               <Route path="/worker/attendance" element={<WorkerAttendance />} />
@@ -153,6 +161,9 @@ function App() {
 
           </Route>
         </Route>
+
+        {/* Fallback Catch-all Route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

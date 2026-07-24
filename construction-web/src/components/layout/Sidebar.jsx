@@ -16,7 +16,9 @@ import {
   CalendarCheck,
   Activity,
   Megaphone,
-  ShieldAlert
+  ShieldAlert,
+  Building2,
+  Sparkles
 } from 'lucide-react';
 
 const adminLinks = [
@@ -37,6 +39,7 @@ const adminLinks = [
 const contractorLinks = [
   { name: 'Dashboard', path: '/contractor/dashboard', icon: LayoutDashboard },
   { name: 'Projects', path: '/contractor/projects', icon: Briefcase },
+  { name: 'Opportunities', path: '/contractor/opportunities', icon: Sparkles },
   { name: 'Workers', path: '/contractor/workers', icon: Users },
   { name: 'Attendance', path: '/contractor/attendance', icon: ClipboardList },
   { name: 'Materials', path: '/contractor/materials', icon: Package },
@@ -49,18 +52,16 @@ const contractorLinks = [
 
 const homeownerLinks = [
   { name: 'Dashboard', path: '/homeowner/dashboard', icon: LayoutDashboard },
-  { name: 'My Projects', path: '/homeowner/projects', icon: Briefcase },
-  { name: 'Construction Progress', path: '/homeowner/progress', icon: LineChart },
-  { name: 'Expenses', path: '/homeowner/expenses', icon: Receipt },
-  { name: 'Documents', path: '/homeowner/documents', icon: FileText },
+  { name: 'My Buildings', path: '/homeowner/buildings', icon: Building2 },
   { name: 'Notifications', path: '/homeowner/notifications', icon: Bell },
+  { name: 'My Profile', path: '/homeowner/settings', icon: UserCircle },
   { name: 'Settings', path: '/homeowner/settings', icon: Settings },
 ];
 
 const workerLinks = [
   { name: 'Dashboard', path: '/worker/dashboard', icon: LayoutDashboard },
   { name: 'My Profile', path: '/worker/profile', icon: UserCircle },
-  { name: 'Assigned Projects', path: '/worker/projects', icon: Briefcase },
+  { name: 'My Buildings', path: '/worker/buildings', icon: Building2 },
   { name: 'Upload Progress', path: '/worker/upload-progress', icon: Upload },
   { name: 'Attendance', path: '/worker/attendance', icon: CalendarCheck },
   { name: 'Notifications', path: '/worker/notifications', icon: Bell },
@@ -112,7 +113,7 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
               
               return (
                 <Link
-                  key={link.path}
+                  key={link.path + link.name}
                   to={link.path}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors ${
                     isActive 

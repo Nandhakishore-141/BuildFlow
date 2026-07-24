@@ -58,4 +58,14 @@ router.get(
   authController.getMe
 );
 
+router.post(
+  '/google/verify',
+  authController.googleVerify
+);
+
+router.post(
+  '/google/register',
+  authController.googleRegister
+);
+
 export default router;

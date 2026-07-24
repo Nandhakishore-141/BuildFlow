@@ -44,7 +44,7 @@ export const getProjectById = async (userId, userRole, projectId) => {
 
   if (userRole === 'Worker') {
     const workerProjects = await projectRepository.findProjectsByWorker(userId);
-    const isAssigned = workerProjects.some(p => p.id === projectId);
+    const isAssigned = workerProjects.data.some(p => p.id === projectId);
     if (!isAssigned) {
       const error = new Error('Unauthorized. You are not assigned to this project.');
       error.status = 403;
@@ -52,21 +52,37 @@ export const getProjectById = async (userId, userRole, projectId) => {
     }
   }
 
+  // Attach workers if Contractor, Admin, or Homeowner
+  if (['Contractor', 'Admin', 'Homeowner'].includes(userRole)) {
+    project.assigned_workers = await projectRepository.getProjectWorkers(projectId);
+  }
+
   return project;
 };
 
-export const getProjects = async (userId, userRole) => {
+export const getProjects = async (userId, userRole, filters) => {
+  let result;
   if (userRole === 'Contractor') {
-    return await projectRepository.findProjectsByContractor(userId);
+    result = await projectRepository.findProjectsByContractor(userId, filters);
   } else if (userRole === 'Homeowner') {
-    return await projectRepository.findProjectsByOwner(userId);
+    result = await projectRepository.findProjectsByOwner(userId, filters);
   } else if (userRole === 'Worker') {
-    return await projectRepository.findProjectsByWorker(userId);
+    result = await projectRepository.findProjectsByWorker(userId, filters);
   } else if (userRole === 'Admin') {
-    // Return all projects for admin - assuming we add findAllProjects to repository if needed later
-    return [];
+    result = await projectRepository.findAllProjects(filters);
+  } else {
+    result = { data: [], total: 0, page: 1, limit: 10 };
   }
-  return [];
+  
+  return {
+    data: result.data,
+    pagination: {
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: Math.ceil(result.total / result.limit)
+    }
+  };
 };
 
 export const updateProject = async (contractorId, projectId, updateData) => {
@@ -111,9 +127,6 @@ export const archiveProject = async (contractorId, projectId) => {
     throw error;
   }
 
-  // Instead of hard deleting, we might want to just archive by status. But the prompt says "Soft Delete / Archive"
-  // Let's implement it as a hard delete for now, or update status to 'Suspended'/'Completed' based on standard.
-  // Actually, deleteProject deletes it. We will just use deleteProject as per repo.
   return await projectRepository.deleteProject(projectId);
 };
 
@@ -145,4 +158,49 @@ export const updateProgress = async (contractorId, projectId, progress) => {
     throw error;
   }
   return await projectRepository.updateProjectProgress(projectId, progress);
+};
+
+export const assignWorkerToProject = async (contractorId, projectId, workerId) => {
+  const project = await projectRepository.findProjectById(projectId);
+  if (!project) {
+    const error = new Error('Project not found');
+    error.status = 404;
+    throw error;
+  }
+  if (project.contractor_id !== contractorId) {
+    const error = new Error('Unauthorized. Only the assigned contractor can assign workers.');
+    error.status = 403;
+    throw error;
+  }
+  return await projectRepository.assignWorker(projectId, workerId);
+};
+
+export const getBuildingWorkspace = async (userId, userRole, projectId) => {
+  if (userRole === 'Worker') {
+    const workspace = await projectRepository.getWorkerBuildingWorkspace(userId, projectId);
+    if (!workspace) {
+      const error = new Error('Forbidden. You are not assigned to this building.');
+      error.status = 403;
+      throw error;
+    }
+    return workspace;
+  }
+  const project = await getProjectById(userId, userRole, projectId);
+  return { project };
+};
+
+export const removeWorkerFromProject = async (contractorId, projectId, workerId) => {
+  const project = await projectRepository.findProjectById(projectId);
+  if (!project) {
+    const error = new Error('Project not found.');
+    error.status = 404;
+    throw error;
+  }
+  if (project.contractor_id !== contractorId) {
+    const error = new Error('Unauthorized access.');
+    error.status = 403;
+    throw error;
+  }
+
+  return await projectRepository.removeWorker(projectId, workerId);
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Check, X } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 export const PasswordInput = React.forwardRef(({
@@ -7,9 +7,28 @@ export const PasswordInput = React.forwardRef(({
   error,
   className,
   id,
+  value,
+  onChange,
+  showStrength = true,
   ...props
 }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [localValue, setLocalValue] = useState(value || '');
+
+  const handleChange = (e) => {
+    setLocalValue(e.target.value);
+    if (onChange) onChange(e);
+  };
+
+  const rules = [
+    { label: 'At least 8 characters', met: localValue.length >= 8 },
+    { label: 'One uppercase letter', met: /[A-Z]/.test(localValue) },
+    { label: 'One lowercase letter', met: /[a-z]/.test(localValue) },
+    { label: 'One number', met: /[0-9]/.test(localValue) },
+    { label: 'One special character', met: /[@$!%*?&]/.test(localValue) }
+  ];
+
+  const showRequirements = showStrength && localValue.length > 0;
 
   return (
     <div className="w-full mb-4">
@@ -26,6 +45,8 @@ export const PasswordInput = React.forwardRef(({
           id={id}
           ref={ref}
           type={showPassword ? 'text' : 'password'}
+          value={value !== undefined ? value : localValue}
+          onChange={handleChange}
           className={cn(
             'w-full pl-4 pr-12 py-3 text-sm text-neutral-900 placeholder-neutral-400 bg-neutral-50/50 hover:bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-gold-500 focus:bg-white transition-all duration-200',
             error && 'border-red-500 focus:border-red-500 bg-red-50/10',
@@ -46,7 +67,23 @@ export const PasswordInput = React.forwardRef(({
           )}
         </button>
       </div>
-      {error && (
+      
+      {showRequirements && (
+        <div className="mt-3 space-y-1.5 p-3 bg-neutral-50 border border-neutral-100 rounded-lg">
+          {rules.map((rule, idx) => (
+            <div key={idx} className="flex items-center gap-2 text-xs font-medium">
+              {rule.met ? (
+                <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              ) : (
+                <X className="w-3.5 h-3.5 text-neutral-300 shrink-0" />
+              )}
+              <span className={rule.met ? 'text-emerald-700' : 'text-neutral-500'}>{rule.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {error && !showRequirements && (
         <p className="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1">
           <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />

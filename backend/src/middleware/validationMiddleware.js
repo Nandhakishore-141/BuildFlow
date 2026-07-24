@@ -7,13 +7,17 @@ import { validationResult } from 'express-validator';
 export const checkValidation = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    const structuredErrors = {};
+    errors.array().forEach((err) => {
+      if (!structuredErrors[err.path]) {
+        structuredErrors[err.path] = err.msg;
+      }
+    });
+
     return res.status(400).json({
       status: 'error',
       message: 'Validation failed.',
-      errors: errors.array().map((err) => ({
-        field: err.path,
-        message: err.msg,
-      })),
+      errors: structuredErrors,
     });
   }
   next();

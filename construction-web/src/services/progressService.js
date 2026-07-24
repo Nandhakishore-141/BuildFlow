@@ -11,3 +11,8 @@ export const createProgress = async (data) => {
   const response = await axios.post(API_URL, data);
   return response.data;
 };
+
+export const getHomeownerProgress = async (projectId) => {
+  const response = await axios.get(`http://localhost:5000/api/homeowner/projects/${projectId}/progress`);
+  return response.data;
+};

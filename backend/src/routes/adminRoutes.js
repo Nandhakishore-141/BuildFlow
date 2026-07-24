@@ -4,9 +4,16 @@ import * as adminController from '../controllers/adminController.js';
 
 const router = express.Router();
 
-// Protect all admin routes
+// Require authentication for all admin routes
 router.use(requireAuth);
+
+// Stop impersonation endpoint (must be accessible when in impersonated user role)
+router.post('/stop-impersonation', adminController.stopImpersonation);
+
+// Restrict all remaining admin routes to Admin role only
 router.use(requireRole('Admin'));
+
+router.post('/impersonate/:userId', adminController.impersonateUser);
 
 router.get('/dashboard', adminController.getDashboard);
 router.get('/users', adminController.getUsers);
@@ -17,6 +24,8 @@ router.get('/projects', adminController.getProjects);
 router.get('/reports', adminController.getReports);
 router.get('/analytics', adminController.getAnalytics);
 router.get('/audit-logs', adminController.getAuditLogs);
+router.get('/notifications', adminController.getNotifications);
+router.put('/notifications/:id/read', adminController.markNotificationRead);
 
 router.get('/announcements', adminController.getAnnouncements);
 router.post('/announcements', adminController.createAnnouncement);

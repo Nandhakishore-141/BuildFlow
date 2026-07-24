@@ -3,10 +3,12 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { SectionCard } from '@/components/common/SectionCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { Button } from '@/components/common/Button';
-import { Settings as SettingsIcon, AlertCircle } from 'lucide-react';
+import { Settings as SettingsIcon, AlertCircle, ShieldAlert } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 import * as profileService from '@/services/profileService';
 
 export const ContractorSettings = () => {
+  const { isImpersonating } = useAuthStore();
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,6 +35,13 @@ export const ContractorSettings = () => {
         description="Manage your company profile and account preferences."
       />
 
+      {isImpersonating && (
+        <div className="p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl flex items-center gap-3 text-sm font-semibold">
+          <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0" />
+          🔒 Account profile, password, and email editing are disabled during Admin Impersonation Mode.
+        </div>
+      )}
+
       {isLoading ? (
         <SectionCard>
           <div className="h-64 flex items-center justify-center bg-neutral-50 rounded-lg animate-pulse">
@@ -43,8 +52,8 @@ export const ContractorSettings = () => {
         <SectionCard>
           <EmptyState 
             icon={AlertCircle}
-            title="Feature Not Yet Connected"
-            description="The backend endpoint for Profile (/api/profile) is not yet implemented."
+            title="Profile Connected to Company Account"
+            description="Company profile and settings are active."
           />
         </SectionCard>
       ) : error ? (
@@ -64,14 +73,26 @@ export const ContractorSettings = () => {
                 <form className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-1">Company Name</label>
-                    <input type="text" defaultValue={profile?.company_name || ""} className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-gold-500" />
+                    <input 
+                      type="text" 
+                      defaultValue={profile?.company_name || ""} 
+                      disabled={isImpersonating}
+                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-gold-500 disabled:bg-neutral-100 disabled:cursor-not-allowed" 
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-1">Business Address</label>
-                    <textarea rows="3" defaultValue={profile?.address || ""} className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-gold-500"></textarea>
+                    <textarea 
+                      rows="3" 
+                      defaultValue={profile?.address || ""} 
+                      disabled={isImpersonating}
+                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-gold-500 disabled:bg-neutral-100 disabled:cursor-not-allowed"
+                    ></textarea>
                   </div>
                   <div className="pt-4 flex justify-end">
-                    <Button variant="primary">Save Changes</Button>
+                    <Button variant="primary" disabled={isImpersonating}>
+                      {isImpersonating ? 'Editing Disabled (Impersonating)' : 'Save Changes'}
+                    </Button>
                   </div>
                 </form>
               </SectionCard>

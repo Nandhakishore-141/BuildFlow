@@ -103,15 +103,43 @@ export const verifyEmail = async (req, res, next) => {
 export const getMe = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    // We could fetch from repository directly or create a service method
-    // authService.getUserProfile(userId) would be better architecture.
-    // For now, let's use the service.
     const userProfile = await authService.getUserProfile(userId);
     res.status(200).json({
       status: 'success',
-      data: {
-        user: userProfile,
-      }
+      data: { user: userProfile }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const googleVerify = async (req, res, next) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ status: 'error', message: 'Google credential is required' });
+    }
+    const result = await authService.googleLogin(credential);
+    res.status(200).json({
+      status: 'success',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const googleRegister = async (req, res, next) => {
+  try {
+    const { credential, ...onboardingData } = req.body;
+    if (!credential) {
+      return res.status(400).json({ status: 'error', message: 'Google credential is required' });
+    }
+    const result = await authService.googleRegister(credential, onboardingData);
+    res.status(201).json({
+      status: 'success',
+      message: 'Google Account registered successfully.',
+      data: result
     });
   } catch (error) {
     next(error);

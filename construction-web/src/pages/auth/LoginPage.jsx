@@ -9,9 +9,9 @@ import { FormHeader } from '@/components/auth/FormHeader';
 import { AuthInput } from '@/components/auth/AuthInput';
 import { PasswordInput } from '@/components/auth/PasswordInput';
 import { AuthButton } from '@/components/auth/AuthButton';
-import { SocialLoginButton } from '@/components/auth/SocialLoginButton';
 import { AuthFooter } from '@/components/auth/AuthFooter';
 import { useState } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
@@ -22,6 +22,7 @@ const loginSchema = z.object({
 export function LoginPage() {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
+  const googleVerify = useAuthStore((state) => state.googleVerify);
   const isLoading = useAuthStore((state) => state.isLoading);
   const globalError = useAuthStore((state) => state.error);
   const clearError = useAuthStore((state) => state.clearError);
@@ -30,6 +31,7 @@ export function LoginPage() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
@@ -40,20 +42,43 @@ export function LoginPage() {
     },
   });
 
+  const navigateToDashboard = () => {
+    const user = useAuthStore.getState().user;
+    if (user?.role === 'Admin') navigate('/admin/dashboard');
+    else if (user?.role === 'Contractor') navigate('/contractor/dashboard');
+    else if (user?.role === 'Worker') navigate('/worker/dashboard');
+    else if (user?.role === 'Homeowner') navigate('/homeowner/dashboard');
+    else navigate('/');
+  };
+
   const onSubmit = async (data) => {
     clearError();
     setSuccessMsg('');
     const result = await login(data.email, data.password);
     if (result.success) {
       setSuccessMsg('Successfully logged in! Redirecting...');
-      setTimeout(() => {
-        const user = useAuthStore.getState().user;
-        if (user?.role === 'Admin') navigate('/admin/dashboard');
-        else if (user?.role === 'Contractor') navigate('/contractor/dashboard');
-        else if (user?.role === 'Worker') navigate('/worker/dashboard');
-        else if (user?.role === 'Homeowner') navigate('/homeowner/dashboard');
-        else navigate('/');
-      }, 1200);
+      setTimeout(() => navigateToDashboard(), 1200);
+    } else if (result.errors) {
+      Object.keys(result.errors).forEach((field) => {
+        if (['email', 'password'].includes(field)) {
+          setError(field, { type: 'server', message: result.errors[field] });
+        }
+      });
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    clearError();
+    setSuccessMsg('');
+    const result = await googleVerify(credentialResponse.credential);
+    if (result.success) {
+      if (result.requires_onboarding) {
+        // Redirect to register wizard with google profile state
+        navigate('/register', { state: { authMethod: 'google', googleProfile: result.googleProfile, credential: credentialResponse.credential } });
+      } else {
+        setSuccessMsg('Google Login successful! Redirecting...');
+        setTimeout(() => navigateToDashboard(), 1200);
+      }
     }
   };
 
@@ -127,15 +152,25 @@ export function LoginPage() {
             </AuthButton>
           </div>
 
-
           <div className="relative flex items-center justify-center my-6">
             <div className="absolute inset-x-0 h-px bg-neutral-200" />
             <span className="relative px-3 bg-white text-xs text-neutral-400 font-semibold uppercase tracking-wider">
               Or continue with
             </span>
           </div>
-
-          <SocialLoginButton />
+          
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => {
+                useAuthStore.setState({ error: 'Google Login failed.' });
+              }}
+              useOneTap
+              theme="outline"
+              size="large"
+              width="100%"
+            />
+          </div>
         </form>
 
         <p className="mt-8 text-center text-sm text-neutral-500">

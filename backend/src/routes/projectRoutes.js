@@ -13,6 +13,9 @@ router.get('/', projectController.listProjects);
 // GET /api/projects/:id - Get project details
 router.get('/:id', projectController.getProjectDetails);
 
+// GET /api/projects/:id/building-workspace - Get building workspace details for worker
+router.get('/:id/building-workspace', projectController.getBuildingWorkspace);
+
 // POST /api/projects - Create a new project (Contractor only)
 router.post(
   '/', 
@@ -48,6 +51,20 @@ router.patch(
   '/:id/progress', 
   requireRole('Contractor'), 
   projectController.updateProgress
+);
+
+// POST /api/projects/:id/workers/:workerId - Assign a worker (Contractor only)
+router.post(
+  '/:id/workers/:workerId',
+  requireRole('Contractor'),
+  projectController.assignWorker
+);
+
+// DELETE /api/projects/:id/workers/:workerId - Remove a worker (Contractor only)
+router.delete(
+  '/:id/workers/:workerId',
+  requireRole('Contractor'),
+  projectController.removeWorker
 );
 
 export default router;

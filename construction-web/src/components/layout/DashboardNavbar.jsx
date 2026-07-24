@@ -1,16 +1,24 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { Menu, Bell, ChevronDown, LogOut, User } from 'lucide-react';
+import { Menu, Bell, ChevronDown, LogOut, User, Undo2, ShieldAlert } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/common/Button';
 
 export const DashboardNavbar = ({ onMenuClick }) => {
-  const { user, logout } = useAuthStore();
+  const { user, logout, isImpersonating, stopImpersonation } = useAuthStore();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleReturnToAdmin = async () => {
+    const res = await stopImpersonation();
+    if (res.success) {
+      navigate('/admin/dashboard');
+    }
   };
 
   return (
@@ -23,13 +31,31 @@ export const DashboardNavbar = ({ onMenuClick }) => {
           <Menu className="w-5 h-5" />
         </button>
         
-        {/* Placeholder for Breadcrumbs */}
-        <div className="hidden md:block">
+        <div className="hidden md:flex items-center gap-3">
           <span className="text-sm font-medium text-neutral-500 capitalize">{user?.role} Dashboard</span>
+          
+          {isImpersonating && (
+            <span className="px-2.5 py-0.5 text-xs font-bold bg-rose-600 text-white rounded-full flex items-center gap-1 uppercase tracking-wider animate-pulse shadow-xs">
+              <ShieldAlert className="w-3.5 h-3.5" />
+              IMPERSONATING
+            </span>
+          )}
         </div>
       </div>
 
       <div className="flex items-center gap-3 md:gap-5">
+        {isImpersonating && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleReturnToAdmin}
+            className="bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200 font-bold gap-1 text-xs"
+          >
+            <Undo2 className="w-3.5 h-3.5" />
+            Return to Admin
+          </Button>
+        )}
+
         <button className="relative p-2 text-neutral-500 hover:bg-neutral-100 rounded-full transition-colors">
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
@@ -56,7 +82,7 @@ export const DashboardNavbar = ({ onMenuClick }) => {
                 className="fixed inset-0 z-40"
                 onClick={() => setShowProfileMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 py-1 overflow-hidden">
+              <div className="absolute right-0 mt-2 w-52 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 py-1 overflow-hidden">
                 <div className="px-4 py-2 border-b border-neutral-100 mb-1 md:hidden">
                   <p className="text-sm font-bold text-neutral-900">{user?.name}</p>
                   <p className="text-xs text-neutral-500">{user?.email}</p>
@@ -71,6 +97,19 @@ export const DashboardNavbar = ({ onMenuClick }) => {
                   My Profile
                 </Link>
                 
+                {isImpersonating && (
+                  <button 
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      handleReturnToAdmin();
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-700 hover:bg-rose-50 transition-colors font-bold border-t border-neutral-100"
+                  >
+                    <Undo2 className="w-4 h-4" />
+                    Return to Admin
+                  </button>
+                )}
+
                 <div className="h-px bg-neutral-100 my-1"></div>
                 
                 <button 

@@ -6,11 +6,13 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { TablePlaceholder } from '@/components/common/TablePlaceholder';
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal';
-import { Briefcase, Plus, Filter, MoreVertical, Edit2, Trash2, CheckCircle } from 'lucide-react';
+import { Briefcase, Plus, Filter, Edit2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import * as projectService from '@/services/projectService';
 
 export const ContractorProjects = () => {
   const [projects, setProjects] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, totalPages: 1 });
+  const [filters, setFilters] = useState({ search: '', status: '' });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -19,24 +21,22 @@ export const ContractorProjects = () => {
   const [currentProject, setCurrentProject] = useState(null);
   
   const [formData, setFormData] = useState({
-    project_name: '',
-    project_code: '',
-    description: '',
-    budget: '',
-    planned_start_date: '',
-    planned_end_date: '',
-    address: '',
-    city: '',
-    state: '',
-    country: ''
+    project_name: '', project_code: '', description: '', budget: '',
+    planned_start_date: '', planned_end_date: '', address: '', city: '', state: '', country: ''
   });
 
   const fetchProjects = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await projectService.getProjects();
-      setProjects(res.data.projects || []);
+      const res = await projectService.getProjects({
+        page: pagination.page,
+        limit: pagination.limit,
+        search: filters.search,
+        status: filters.status
+      });
+      setProjects(res.data.data || []);
+      setPagination(res.data.pagination || { page: 1, limit: 10, totalPages: 1 });
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to fetch projects');
     } finally {
@@ -46,11 +46,16 @@ export const ContractorProjects = () => {
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [pagination.page, filters]); // Re-fetch on page or filter change
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFilterChange = (name, value) => {
+    setFilters(prev => ({ ...prev, [name]: value }));
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to page 1 on filter
   };
 
   const handleCreateSubmit = async (e) => {
@@ -140,9 +145,18 @@ export const ContractorProjects = () => {
 
       <SectionCard>
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <SearchBar placeholder="Search projects..." className="flex-1" />
+          <SearchBar 
+            placeholder="Search projects..." 
+            className="flex-1"
+            value={filters.search}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+          />
           <div className="flex gap-2">
-            <select className="px-4 py-2 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500">
+            <select 
+              className="px-4 py-2 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500"
+              value={filters.status}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+            >
               <option value="">All Statuses</option>
               <option value="Planning">Planning</option>
               <option value="In Progress">In Progress</option>
@@ -166,77 +180,106 @@ export const ContractorProjects = () => {
             description="You haven't created any projects yet. Click the button above to get started."
           />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-neutral-200 bg-neutral-50 text-sm">
-                  <th className="p-4 font-semibold text-neutral-600">Project Details</th>
-                  <th className="p-4 font-semibold text-neutral-600">Owner</th>
-                  <th className="p-4 font-semibold text-neutral-600">Status</th>
-                  <th className="p-4 font-semibold text-neutral-600">Progress</th>
-                  <th className="p-4 font-semibold text-neutral-600 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100">
-                {projects.map((project) => (
-                  <tr key={project.id} className="hover:bg-neutral-50/50 transition-colors">
-                    <td className="p-4">
-                      <p className="font-bold text-neutral-900">{project.project_name}</p>
-                      <p className="text-sm text-neutral-500">{project.project_code} • {project.city}</p>
-                    </td>
-                    <td className="p-4">
-                      <p className="font-medium text-neutral-700">{project.owner_name || 'Unassigned'}</p>
-                    </td>
-                    <td className="p-4">
-                      <select 
-                        value={project.status} 
-                        onChange={(e) => handleUpdateStatus(project.id, e.target.value)}
-                        className={`text-xs font-semibold px-2 py-1 rounded-full border cursor-pointer
-                          ${project.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
-                            project.status === 'In Progress' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
-                            'bg-neutral-100 text-neutral-700 border-neutral-200'}
-                        `}
-                      >
-                        <option value="Planning">Planning</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Suspended">Suspended</option>
-                        <option value="Completed">Completed</option>
-                      </select>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-24 bg-neutral-100 rounded-full h-2">
-                          <div className="bg-gold-500 h-2 rounded-full" style={{ width: `${project.completion_percentage}%` }}></div>
-                        </div>
-                        <span className="text-xs font-bold text-neutral-700">{project.completion_percentage}%</span>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="px-2 py-0.5 text-xs h-auto"
-                          onClick={() => {
-                            const prog = prompt('Enter new completion percentage (0-100):', project.completion_percentage);
-                            if (prog !== null && !isNaN(prog)) handleUpdateProgress(project.id, parseFloat(prog));
-                          }}
-                        >
-                          Update
-                        </Button>
-                      </div>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button onClick={() => openEditModal(project)} className="p-2 text-neutral-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50">
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => handleDelete(project.id)} className="p-2 text-neutral-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-neutral-200 bg-neutral-50 text-sm">
+                    <th className="p-4 font-semibold text-neutral-600">Project Details</th>
+                    <th className="p-4 font-semibold text-neutral-600">Owner</th>
+                    <th className="p-4 font-semibold text-neutral-600">Status</th>
+                    <th className="p-4 font-semibold text-neutral-600">Progress</th>
+                    <th className="p-4 font-semibold text-neutral-600 text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-neutral-100">
+                  {projects.map((project) => (
+                    <tr key={project.id} className="hover:bg-neutral-50/50 transition-colors">
+                      <td className="p-4">
+                        <p className="font-bold text-neutral-900">{project.project_name}</p>
+                        <p className="text-sm text-neutral-500">{project.project_code} • {project.city}</p>
+                      </td>
+                      <td className="p-4">
+                        <p className="font-medium text-neutral-700">{project.owner_name || 'Unassigned'}</p>
+                      </td>
+                      <td className="p-4">
+                        <select 
+                          value={project.status} 
+                          onChange={(e) => handleUpdateStatus(project.id, e.target.value)}
+                          className={`text-xs font-semibold px-2 py-1 rounded-full border cursor-pointer
+                            ${project.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
+                              project.status === 'In Progress' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
+                              'bg-neutral-100 text-neutral-700 border-neutral-200'}
+                          `}
+                        >
+                          <option value="Planning">Planning</option>
+                          <option value="In Progress">In Progress</option>
+                          <option value="Suspended">Suspended</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 bg-neutral-100 rounded-full h-2">
+                            <div className="bg-gold-500 h-2 rounded-full" style={{ width: `${project.completion_percentage}%` }}></div>
+                          </div>
+                          <span className="text-xs font-bold text-neutral-700">{project.completion_percentage}%</span>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="px-2 py-0.5 text-xs h-auto"
+                            onClick={() => {
+                              const prog = prompt('Enter new completion percentage (0-100):', project.completion_percentage);
+                              if (prog !== null && !isNaN(prog)) handleUpdateProgress(project.id, parseFloat(prog));
+                            }}
+                          >
+                            Update
+                          </Button>
+                        </div>
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => openEditModal(project)} className="p-2 text-neutral-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(project.id)} className="p-2 text-neutral-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination Controls */}
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4 px-4">
+                <span className="text-sm text-neutral-500">
+                  Page {pagination.page} of {pagination.totalPages}
+                </span>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                    disabled={pagination.page === 1}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.totalPages, prev.page + 1) }))}
+                    disabled={pagination.page === pagination.totalPages}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </SectionCard>
 

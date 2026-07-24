@@ -2,28 +2,43 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SectionCard } from '@/components/common/SectionCard';
 import { EmptyState } from '@/components/common/EmptyState';
-import { Bell, AlertCircle } from 'lucide-react';
+import { Bell, Check } from 'lucide-react';
+import { Button } from '@/components/common/Button';
 import * as notificationService from '@/services/notificationService';
 
 export const HomeownerNotifications = () => {
-  const [notifications, setNotifications] = useState([]);
+  const [data, setData] = useState({ data: [], unread: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchNotifications = async () => {
+    setIsLoading(true);
+    try {
+      const res = await notificationService.getNotifications('homeowner');
+      setData(res.data || { data: [], unread: 0 });
+    } catch (err) {
+      setError('Failed to load notifications.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await notificationService.getNotifications();
-        setNotifications(res.data?.notifications || []);
-      } catch (err) {
-        if (err.response && err.response.status === 404) setError('404');
-        else setError('Failed to load notifications.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
+    fetchNotifications();
   }, []);
+
+  const handleMarkAsRead = async (id) => {
+    try {
+      await notificationService.markNotificationRead(id, 'homeowner');
+      setData((prev) => ({
+        ...prev,
+        unread: Math.max(0, prev.unread - 1),
+        data: prev.data.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -33,17 +48,17 @@ export const HomeownerNotifications = () => {
       />
 
       <SectionCard>
+        <div className="mb-4">
+          <h2 className="text-lg font-bold text-neutral-900">
+            {data.unread > 0 ? `${data.unread} Unread Notifications` : 'All Notifications'}
+          </h2>
+        </div>
+        
         {isLoading ? (
           <div className="p-8 text-center text-neutral-500 animate-pulse">Loading notifications...</div>
-        ) : error === '404' ? (
-          <EmptyState 
-            icon={AlertCircle}
-            title="Feature Not Yet Connected"
-            description="The backend endpoint for Notifications (/api/notifications) is not yet implemented."
-          />
         ) : error ? (
           <div className="text-center py-8 text-red-500 font-medium">{error}</div>
-        ) : notifications.length === 0 ? (
+        ) : data.data.length === 0 ? (
           <EmptyState 
             icon={Bell}
             title="You're all caught up"
@@ -51,7 +66,38 @@ export const HomeownerNotifications = () => {
           />
         ) : (
           <div className="divide-y divide-neutral-100">
-            {/* Render real notifications here */}
+            {data.data.map(notification => (
+              <div 
+                key={notification.id} 
+                className={`py-4 flex items-start gap-4 ${!notification.is_read ? 'bg-blue-50/50 -mx-6 px-6' : ''}`}
+              >
+                <div className={`p-2 rounded-full ${!notification.is_read ? 'bg-blue-100 text-blue-600' : 'bg-neutral-100 text-neutral-500'}`}>
+                  <Bell className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <h4 className={`text-sm ${!notification.is_read ? 'font-bold text-neutral-900' : 'font-semibold text-neutral-700'}`}>
+                    {notification.title}
+                  </h4>
+                  <p className={`text-sm mt-1 ${!notification.is_read ? 'text-neutral-700' : 'text-neutral-500'}`}>
+                    {notification.message}
+                  </p>
+                  <span className="text-xs text-neutral-400 font-medium block mt-2">
+                    {new Date(notification.created_at).toLocaleString()}
+                  </span>
+                </div>
+                {!notification.is_read && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleMarkAsRead(notification.id)}
+                    className="shrink-0"
+                  >
+                    <Check className="w-4 h-4 mr-1.5" />
+                    Mark Read
+                  </Button>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </SectionCard>

@@ -10,22 +10,30 @@ export const findById = async (id) => {
   return rows[0] || null;
 };
 
+export const findByGoogleId = async (googleId) => {
+  const { rows } = await db.query('SELECT * FROM users WHERE google_id = $1', [googleId]);
+  return rows[0] || null;
+};
+
 export const create = async (user) => {
   const {
     id,
     name,
     email,
-    passwordHash,
+    passwordHash = null,
     role,
     phone,
     companyName = null,
     isVerified = false,
     verificationToken = null,
+    provider = 'local',
+    googleId = null,
+    profilePhoto = null
   } = user;
 
   const sql = `
-    INSERT INTO users (id, name, email, password_hash, role, phone, company_name, is_verified, verification_token)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    INSERT INTO users (id, name, email, password_hash, role, phone, company_name, is_verified, verification_token, provider, google_id, profile_photo)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
   `;
 
   await db.query(sql, [
@@ -38,9 +46,12 @@ export const create = async (user) => {
     companyName,
     isVerified,
     verificationToken,
+    provider,
+    googleId,
+    profilePhoto
   ]);
 
-  return { id, name, email, role, phone, companyName };
+  return { id, name, email, role, phone, companyName, provider, profilePhoto };
 };
 
 export const update = async (id, updates) => {

@@ -15,6 +15,28 @@ export const generateAccessToken = (user) => {
 };
 
 /**
+ * Generate a secure Impersonation Access Token
+ * @param {object} impersonatedUser 
+ * @param {object} originalAdmin 
+ * @returns {string} Signed Impersonation JWT Access Token
+ */
+export const generateImpersonationAccessToken = (impersonatedUser, originalAdmin) => {
+  return jwt.sign(
+    {
+      id: impersonatedUser.id,
+      role: impersonatedUser.role,
+      email: impersonatedUser.email,
+      isImpersonating: true,
+      originalAdminId: originalAdmin.id,
+      originalAdminEmail: originalAdmin.email,
+      originalAdminRole: 'Admin'
+    },
+    process.env.JWT_SECRET || 'super_secret_access_key_12345',
+    { expiresIn: '1h' }
+  );
+};
+
+/**
  * Generate a cryptographically secure random Refresh Token string
  * @returns {string} Secure hexadecimal string
  */

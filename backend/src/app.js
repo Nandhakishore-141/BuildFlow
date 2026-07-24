@@ -8,6 +8,9 @@ import projectRoutes from './routes/projectRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 import adminRoutes from './routes/adminRoutes.js';
+import homeownerRoutes from './routes/homeownerRoutes.js';
+import contractorRoutes from './routes/contractorRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 
 const app = express();
 
@@ -38,6 +41,9 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/homeowner', homeownerRoutes);
+app.use('/api/contractor', contractorRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Unhandled Endpoint Route Catch (404)
 app.use((req, res, next) => {

@@ -7,13 +7,13 @@ export const getDashboard = async () => {
   return response.data;
 };
 
-export const getUsers = async () => {
-  const response = await axios.get(`${API_URL}/users`);
+export const getUsers = async (params = {}) => {
+  const response = await axios.get(`${API_URL}/users`, { params });
   return response.data;
 };
 
-export const getProjects = async () => {
-  const response = await axios.get(`${API_URL}/projects`);
+export const getProjects = async (params = {}) => {
+  const response = await axios.get(`${API_URL}/projects`, { params });
   return response.data;
 };
 
@@ -27,8 +27,18 @@ export const getAnalytics = async () => {
   return response.data;
 };
 
-export const getAuditLogs = async () => {
-  const response = await axios.get(`${API_URL}/audit-logs`);
+export const getAuditLogs = async (params = {}) => {
+  const response = await axios.get(`${API_URL}/audit-logs`, { params });
+  return response.data;
+};
+
+export const getNotifications = async () => {
+  const response = await axios.get(`${API_URL}/notifications`);
+  return response.data;
+};
+
+export const markNotificationRead = async (id) => {
+  const response = await axios.put(`${API_URL}/notifications/${id}/read`);
   return response.data;
 };
 
@@ -39,6 +49,16 @@ export const getAnnouncements = async () => {
 
 export const createAnnouncement = async (data) => {
   const response = await axios.post(`${API_URL}/announcements`, data);
+  return response.data;
+};
+
+export const impersonateUser = async (userId) => {
+  const response = await axios.post(`${API_URL}/impersonate/${userId}`);
+  return response.data;
+};
+
+export const stopImpersonation = async () => {
+  const response = await axios.post(`${API_URL}/stop-impersonation`);
   return response.data;
 };
 

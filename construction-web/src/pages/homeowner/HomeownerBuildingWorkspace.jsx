@@ -230,6 +230,7 @@ const HomeownerBuildingWorkspaceContent = () => {
       <div className="flex items-center gap-1 border-b border-neutral-200 overflow-x-auto pb-px">
         {[
           { id: 'overview', label: 'Overview', icon: Info },
+          { id: 'expenses', label: `Financials (${expenses.transactions?.length || 0})`, icon: DollarSign },
           { id: 'process', label: `Construction Process (${progress.length})`, icon: LineChart },
           { id: 'team', label: `My Team (${team.workers.length + (team.contractor.name ? 1 : 0)})`, icon: Users },
           { id: 'proposals', label: `Contractor Applications (${proposals.length})`, icon: Briefcase }
@@ -321,6 +322,96 @@ const HomeownerBuildingWorkspaceContent = () => {
               </SectionCard>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* READ-ONLY FINANCIALS TAB FOR HOMEOWNER */}
+      {activeTab === 'expenses' && (
+        <div className="space-y-6">
+          <SectionCard title="Building Financial Summary & Expense Breakdown">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-neutral-50 rounded-xl border border-neutral-200 text-xs">
+              <div>
+                <span className="text-neutral-400 uppercase font-bold text-[10px] block">Allocated Building Budget</span>
+                <strong className="text-neutral-900 text-base">{formatCurrency(expenses.budget)}</strong>
+              </div>
+              <div>
+                <span className="text-neutral-400 uppercase font-bold text-[10px] block">Total Amount Spent</span>
+                <strong className="text-rose-700 text-base">{formatCurrency(expenses.spent)}</strong>
+              </div>
+              <div>
+                <span className="text-neutral-400 uppercase font-bold text-[10px] block">Remaining Balance</span>
+                <strong className="text-emerald-700 text-base">{formatCurrency(expenses.remaining)}</strong>
+              </div>
+              <div>
+                <span className="text-neutral-400 uppercase font-bold text-[10px] block">Budget Utilization</span>
+                <strong className="text-gold-600 text-base font-mono">
+                  {expenses.budget > 0 ? ((expenses.spent / expenses.budget) * 100).toFixed(1) : 0}%
+                </strong>
+              </div>
+            </div>
+
+            {/* Category Breakdown */}
+            {expenses.categoryBreakdown && expenses.categoryBreakdown.length > 0 && (
+              <div className="space-y-3 pt-4 border-t border-neutral-100">
+                <h4 className="font-bold text-xs text-neutral-900 uppercase tracking-wider">Expense Breakdown by Category</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  {expenses.categoryBreakdown.map(cat => (
+                    <div key={cat.category} className="p-3 bg-white rounded-xl border border-neutral-200 text-xs space-y-1">
+                      <span className="text-neutral-500 block text-[11px] font-semibold">{cat.category}</span>
+                      <strong className="text-neutral-900 font-bold block">{formatCurrency(cat.amount)}</strong>
+                      <span className="text-gold-600 font-mono text-[10px]">{cat.percentage}% of spent</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </SectionCard>
+
+          {/* Read-Only Expense Transactions Table */}
+          <SectionCard title={`Building Expense History (${expenses.transactions?.length || 0})`}>
+            {!expenses.transactions || expenses.transactions.length === 0 ? (
+              <EmptyState icon={DollarSign} title="No Expenses Recorded" description="Your contractor has not recorded any building expenses yet." />
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-neutral-200">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b bg-neutral-50 text-neutral-600 font-bold">
+                      <th className="p-3">Expense Title / Item</th>
+                      <th className="p-3">Category</th>
+                      <th className="p-3">Vendor / Supplier</th>
+                      <th className="p-3">Date</th>
+                      <th className="p-3 text-right">Amount (₹)</th>
+                      <th className="p-3 text-right">Receipt</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-200 bg-white font-medium">
+                    {expenses.transactions.map(exp => (
+                      <tr key={exp.id} className="hover:bg-neutral-50">
+                        <td className="p-3 font-bold text-neutral-900">{exp.title || `${exp.category} Expense`}</td>
+                        <td className="p-3">
+                          <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-neutral-100 text-neutral-800 border">
+                            {exp.category}
+                          </span>
+                        </td>
+                        <td className="p-3 text-neutral-600">{exp.vendor || '—'}</td>
+                        <td className="p-3 text-neutral-500 font-mono">{new Date(exp.date).toLocaleDateString()}</td>
+                        <td className="p-3 text-right font-bold text-rose-700">{formatCurrency(exp.amount)}</td>
+                        <td className="p-3 text-right">
+                          {exp.receipt_url ? (
+                            <a href={exp.receipt_url} target="_blank" rel="noreferrer" className="text-gold-600 hover:underline font-bold">
+                              View Receipt
+                            </a>
+                          ) : (
+                            <span className="text-neutral-400">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </SectionCard>
         </div>
       )}
 

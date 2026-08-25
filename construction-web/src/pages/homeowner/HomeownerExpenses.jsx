@@ -18,7 +18,8 @@ export const HomeownerExpenses = () => {
     const fetchProjects = async () => {
       try {
         const res = await projectService.getHomeownerProjects();
-        const projectList = res.data.data || [];
+        const rawProjects = res.data?.data?.data || res.data?.data || res.data || [];
+        const projectList = Array.isArray(rawProjects) ? rawProjects : (Array.isArray(rawProjects?.data) ? rawProjects.data : []);
         setProjects(projectList);
         if (projectList.length > 0) {
           setSelectedProjectId(projectList[0].id);

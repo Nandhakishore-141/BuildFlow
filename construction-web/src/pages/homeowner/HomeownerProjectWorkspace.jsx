@@ -28,6 +28,7 @@ import {
   RefreshCw,
   Info
 } from 'lucide-react';
+import { downloadTextDocument } from '@/utils/reportExporter';
 import * as homeownerService from '@/services/homeownerService';
 
 const PROJECT_COVER_IMAGES = [
@@ -531,8 +532,26 @@ const HomeownerProjectWorkspaceContent = () => {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          onClick={() => window.open(doc.file_url, '_blank')} 
-                          className="gap-1 text-xs"
+                          onClick={() => {
+                            const docTitle = doc.title || 'Document';
+                            const cleanFileName = docTitle.toLowerCase().replace(/[^a-z0-9]/gi, '_');
+                            const content = `========================================================================
+CONSTRUCTIQ SMART CONSTRUCTION & PROJECT MANAGEMENT SYSTEM
+OFFICIAL PROJECT DOCUMENT RECORD
+========================================================================
+
+Document Title:    ${docTitle}
+Document Type:     ${doc.file_type || 'Contract / Blueprint / Permit'}
+Uploaded By:       ${doc.uploader_name || 'Project Lead'}
+Date Recorded:     ${doc.created_at ? new Date(doc.created_at).toLocaleDateString() : 'N/A'}
+Status:            Verified & Active for Project Workspace
+
+========================================================================
+ConstructIQ Platform • Certified Copy
+========================================================================`;
+                            downloadTextDocument(`${cleanFileName}.txt`, content);
+                          }} 
+                          className="gap-1 text-xs font-bold text-gold-700 hover:text-gold-900 border-gold-300 hover:bg-gold-50"
                         >
                           <Download className="w-3.5 h-3.5" /> Download
                         </Button>

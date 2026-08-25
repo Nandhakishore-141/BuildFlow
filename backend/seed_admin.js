@@ -19,7 +19,7 @@ async function seedAdmin() {
     const id = uuidv4();
     const name = 'System Admin';
     const email = 'admin@constructiq.com';
-    const password_hash = await bcrypt.hash('admin123', 10);
+    const password_hash = await bcrypt.hash('pass', 10);
     const role = 'Admin';
     const phone = '0000000000';
     const is_verified = true;
@@ -40,7 +40,7 @@ async function seedAdmin() {
     
     console.log('Successfully seeded admin user:');
     console.log(`Email: ${email}`);
-    console.log(`Password: admin123`);
+    console.log(`Password: pass`);
   } catch (error) {
     console.error('Error seeding admin user:', error);
   } finally {

@@ -76,9 +76,9 @@ const ContractorOpportunitiesContent = () => {
   const handleOpenProposal = (project) => {
     setSelectedProject(project);
     setProposalForm({
-      estimated_budget: project.budget || '',
-      estimated_duration: '6 Months',
-      cover_message: ''
+      estimated_budget: project.my_proposed_budget || project.budget || '',
+      estimated_duration: project.my_proposed_duration || '6 Months',
+      cover_message: project.my_cover_message || ''
     });
     setProposalError(null);
     setIsProposalModalOpen(true);
@@ -235,23 +235,56 @@ const ContractorOpportunitiesContent = () => {
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-neutral-100 flex items-center justify-between">
+                  <div className="pt-4 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-3">
                     <span className="text-xs text-neutral-400">
-                      {opp.my_proposal_status ? (
-                        <span className="font-bold text-emerald-600">Proposal Submitted ({opp.my_proposal_status})</span>
-                      ) : (
-                        `${opp.total_proposals || 0} Proposals Submitted`
-                      )}
+                      {opp.total_proposals || 0} Proposals Submitted
                     </span>
 
-                    <Button 
-                      variant="primary" 
-                      size="sm" 
-                      onClick={() => handleOpenProposal(opp)}
-                      className="bg-gold-500 hover:bg-gold-600 text-white font-bold gap-1 text-xs"
-                    >
-                      <Send className="w-3.5 h-3.5" /> Submit Proposal
-                    </Button>
+                    {opp.my_proposal_status === 'pending' ? (
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1.5 shadow-2xs">
+                          <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                          Waiting for Homeowner Response
+                        </span>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleOpenProposal(opp)}
+                          className="text-xs font-semibold hover:bg-neutral-100"
+                        >
+                          Edit
+                        </Button>
+                      </div>
+                    ) : opp.my_proposal_status === 'accepted' ? (
+                      <span className="px-3 py-1 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        Proposal Accepted!
+                      </span>
+                    ) : (opp.my_proposal_status === 'declined' || opp.my_proposal_status === 'rejected') ? (
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-50 text-rose-800 border border-rose-200 flex items-center gap-1.5">
+                          <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                          Proposal Declined
+                        </span>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleOpenProposal(opp)}
+                          className="text-xs font-semibold hover:bg-neutral-100"
+                        >
+                          Resubmit
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button 
+                        variant="primary" 
+                        size="sm" 
+                        onClick={() => handleOpenProposal(opp)}
+                        className="bg-gold-500 hover:bg-gold-600 text-white font-bold gap-1 text-xs"
+                      >
+                        <Send className="w-3.5 h-3.5" /> Submit Proposal
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}

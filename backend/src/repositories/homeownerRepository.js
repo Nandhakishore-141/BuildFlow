@@ -4,9 +4,9 @@ export const getDashboardStats = async (ownerId) => {
   const query = `
     SELECT 
       COUNT(*) as total_projects,
-      COUNT(*) FILTER (WHERE status = 'In Progress') as active_projects,
-      COUNT(*) FILTER (WHERE status = 'Completed') as completed_projects,
-      COUNT(*) FILTER (WHERE status = 'Planning') as planning_projects,
+      COUNT(CASE WHEN status = 'In Progress' THEN 1 END) as active_projects,
+      COUNT(CASE WHEN status = 'Completed' THEN 1 END) as completed_projects,
+      COUNT(CASE WHEN status = 'Planning' THEN 1 END) as planning_projects,
       COALESCE(AVG(completion_percentage), 0) as avg_completion,
       COALESCE(SUM(budget), 0) as total_budget
     FROM projects

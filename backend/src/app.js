@@ -11,6 +11,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import homeownerRoutes from './routes/homeownerRoutes.js';
 import contractorRoutes from './routes/contractorRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import workerRoutes from './routes/workerRoutes.js';
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/homeowner', homeownerRoutes);
 app.use('/api/contractor', contractorRoutes);
+app.use('/api/worker', workerRoutes);
 app.use('/api/profile', profileRoutes);
 
 // Unhandled Endpoint Route Catch (404)

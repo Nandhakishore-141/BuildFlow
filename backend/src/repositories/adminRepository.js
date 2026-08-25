@@ -136,8 +136,8 @@ class AdminRepository {
     const totalBudget = await pool.query('SELECT COALESCE(SUM(budget), 0) as total FROM projects');
     const totalExpenses = await pool.query('SELECT COALESCE(SUM(amount), 0) as total FROM expenses');
     const materialsLowStock = await pool.query("SELECT COUNT(*) FROM materials WHERE quantity < 50 OR status = 'Ordered'");
-    const attendanceToday = await pool.query('SELECT COUNT(DISTINCT worker_id) FROM attendance WHERE DATE(clock_in) = CURRENT_DATE OR clock_in >= NOW() - INTERVAL \'24 hours\'');
-    const pendingNotifications = await pool.query('SELECT COUNT(*) FROM notifications WHERE is_read = false');
+    const attendanceToday = await pool.query('SELECT COUNT(DISTINCT worker_id) as count FROM attendance WHERE DATE(clock_in) = CURRENT_DATE OR clock_in >= NOW() - INTERVAL 24 HOUR');
+    const pendingNotifications = await pool.query('SELECT COUNT(*) as count FROM notifications WHERE is_read = false');
     
     const recentRegistrations = await pool.query(`
       SELECT id, name, email, role, company_name, is_verified, created_at 
@@ -187,10 +187,8 @@ class AdminRepository {
     `);
 
     const financialSummary = await pool.query(`
-      SELECT COALESCE(SUM(p.budget), 0) as total_budget,
-             COALESCE(SUM(e.amount), 0) as total_expenses
-      FROM projects p
-      LEFT JOIN expenses e ON true
+      SELECT (SELECT COALESCE(SUM(budget), 0) FROM projects) as total_budget,
+             (SELECT COALESCE(SUM(amount), 0) FROM expenses) as total_expenses
     `);
 
     const workforceSummary = await pool.query(`

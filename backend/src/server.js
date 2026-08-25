@@ -18,7 +18,7 @@ const startServer = async () => {
       console.log(` Local URL: http://localhost:${PORT}`);
       console.log(`=========================================`);
       console.log('');
-      console.log(`✓ PostgreSQL Connected`);
+      console.log(`✓ MySQL Connected`);
       console.log(`✓ Database: ${process.env.DB_NAME || 'constructiq'}`);
       console.log(`✓ Authentication Module Loaded`);
       console.log(`✓ Routes Registered`);

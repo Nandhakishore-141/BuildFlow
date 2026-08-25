@@ -33,9 +33,9 @@ async function seedDemoData() {
   };
 
   try {
-    // Hash common password 'Password@123' once for speed
-    const defaultPasswordHash = await bcrypt.hash('Password@123', 10);
-    const adminPasswordHash = await bcrypt.hash('Password@123', 10);
+    // Hash common password 'pass' once for speed
+    const defaultPasswordHash = await bcrypt.hash('pass', 10);
+    const adminPasswordHash = await bcrypt.hash('pass', 10);
 
     // ==========================================
     // 1. ADMIN USER
@@ -46,7 +46,7 @@ async function seedDemoData() {
     if (adminCheck.rows.length > 0) {
       await db.query(`UPDATE users SET password_hash = $1 WHERE email = $2`, [adminPasswordHash, 'admin@constructiq.com']);
       adminUser = (await db.query(`SELECT * FROM users WHERE email = $1`, ['admin@constructiq.com'])).rows[0];
-      console.log('   ↳ Existing Admin user updated with Password@123');
+      console.log('   ↳ Existing Admin user updated with pass');
     } else {
       const adminId = uuidv4();
       const insertAdmin = await db.query(
@@ -778,7 +778,7 @@ async function seedDemoData() {
     console.table(stats);
 
     console.log('\n🔑 Demo Credentials Summary:');
-    console.log('   All passwords: Password@123');
+    console.log('   All passwords: pass');
     console.log('   Admin:        admin@constructiq.com');
     console.log('   Contractors:  contact@abcconstructions.com, contact@skylinebuilders.com, ...');
     console.log('   Homeowners:   robert.taylor@example.com, sarah.jenkins@example.com, ...');

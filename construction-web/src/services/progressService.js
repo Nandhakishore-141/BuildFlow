@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/progress';
+const API_URL = 'http://localhost:5000/api/worker/progress';
 
 export const getProgress = async () => {
   const response = await axios.get(API_URL);

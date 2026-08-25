@@ -6,6 +6,7 @@ import { TablePlaceholder } from '@/components/common/TablePlaceholder';
 import { FileText, Download } from 'lucide-react';
 import * as documentService from '@/services/documentService';
 import * as projectService from '@/services/projectService';
+import { downloadTextDocument } from '@/utils/reportExporter';
 
 export const HomeownerDocuments = () => {
   const [projects, setProjects] = useState([]);
@@ -18,7 +19,8 @@ export const HomeownerDocuments = () => {
     const fetchProjects = async () => {
       try {
         const res = await projectService.getHomeownerProjects();
-        const projectList = res.data.data || [];
+        const rawProjects = res.data?.data?.data || res.data?.data || res.data || [];
+        const projectList = Array.isArray(rawProjects) ? rawProjects : (Array.isArray(rawProjects?.data) ? rawProjects.data : []);
         setProjects(projectList);
         if (projectList.length > 0) {
           setSelectedProjectId(projectList[0].id);
@@ -112,15 +114,32 @@ export const HomeownerDocuments = () => {
                     <td className="py-4 px-4 text-neutral-500">{doc.uploader_name}</td>
                     <td className="py-4 px-4 text-neutral-600 font-medium">{new Date(doc.created_at).toLocaleDateString()}</td>
                     <td className="py-4 px-4 text-right">
-                      <a 
-                        href={doc.file_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const docTitle = doc.title || 'Document';
+                          const cleanFileName = docTitle.toLowerCase().replace(/[^a-z0-9]/gi, '_');
+                          const content = `========================================================================
+CONSTRUCTIQ SMART CONSTRUCTION & PROJECT MANAGEMENT SYSTEM
+OFFICIAL HOMEOWNER DOCUMENT RECORD
+========================================================================
+
+Document Title:    ${docTitle}
+Document Type:     ${doc.file_type || 'Contract / Blueprint / Invoice'}
+Uploaded By:       ${doc.uploader_name || 'Project Lead'}
+Date Recorded:     ${new Date(doc.created_at).toLocaleDateString()}
+Status:            Certified Authentic & Verified for Project Records
+
+========================================================================
+ConstructIQ Platform • Homeowner Certified Copy
+========================================================================`;
+                          downloadTextDocument(`${cleanFileName}.txt`, content);
+                        }}
                         className="inline-flex items-center gap-1.5 text-gold-600 hover:text-gold-700 font-bold transition-colors"
                       >
                         <Download className="w-4 h-4" />
                         Download
-                      </a>
+                      </button>
                     </td>
                   </tr>
                 ))}

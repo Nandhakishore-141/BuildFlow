@@ -54,7 +54,6 @@ const homeownerLinks = [
   { name: 'Dashboard', path: '/homeowner/dashboard', icon: LayoutDashboard },
   { name: 'My Buildings', path: '/homeowner/buildings', icon: Building2 },
   { name: 'Notifications', path: '/homeowner/notifications', icon: Bell },
-  { name: 'My Profile', path: '/homeowner/settings', icon: UserCircle },
   { name: 'Settings', path: '/homeowner/settings', icon: Settings },
 ];
 

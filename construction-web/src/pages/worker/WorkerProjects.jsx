@@ -31,8 +31,12 @@ const WorkerBuildingsContent = () => {
     setError(null);
     try {
       const res = await projectService.getProjects({ page: pagination.page, limit: pagination.limit, search });
-      setBuildings(res.data.data || []);
-      setPagination(res.data.pagination || { page: 1, limit: 10, totalPages: 1 });
+      const rawProjects = res.data?.data?.data || res.data?.data || res.data || [];
+      const projsList = Array.isArray(rawProjects) ? rawProjects : (Array.isArray(rawProjects?.data) ? rawProjects.data : []);
+      setBuildings(projsList);
+      
+      const paginationData = res.data?.data?.pagination || res.data?.pagination;
+      setPagination(paginationData || { page: 1, limit: 10, totalPages: 1 });
     } catch (err) {
       console.error("Failed to load worker assigned buildings:", err);
       setError('Failed to load your assigned building sites.');

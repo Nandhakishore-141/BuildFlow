@@ -18,10 +18,11 @@ const sizeStyles = {
 };
 
 const Button = forwardRef(
-  ({ className, variant = 'primary', size = 'md', children, ...props }, ref) => {
+  ({ className, variant = 'primary', size = 'md', isLoading, disabled, children, ...props }, ref) => {
     return (
       <button
         ref={ref}
+        disabled={disabled || isLoading}
         className={cn(
           'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all duration-200 cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-500 disabled:opacity-50 disabled:pointer-events-none',
           variantStyles[variant],
@@ -30,6 +31,9 @@ const Button = forwardRef(
         )}
         {...props}
       >
+        {isLoading && (
+          <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin shrink-0" />
+        )}
         {children}
       </button>
     );

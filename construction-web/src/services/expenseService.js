@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_URL as BASE_API_URL } from './apiClient';
 
-const API_URL = 'http://localhost:5000/api/expenses';
+const API_URL = `${BASE_API_URL}/expenses`;
 
 export const getExpenses = async () => {
   const response = await axios.get(API_URL);
@@ -8,6 +9,6 @@ export const getExpenses = async () => {
 };
 
 export const getHomeownerExpenses = async (projectId) => {
-  const response = await axios.get(`http://localhost:5000/api/homeowner/projects/${projectId}/expenses`);
+  const response = await axios.get(`${BASE_API_URL}/homeowner/projects/${projectId}/expenses`);
   return response.data;
 };

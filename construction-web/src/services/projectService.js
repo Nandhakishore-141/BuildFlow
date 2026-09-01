@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_URL as BASE_API_URL } from './apiClient';
 
-const API_URL = 'http://localhost:5000/api/projects';
+const API_URL = `${BASE_API_URL}/projects`;
 
 export const getProjects = async (params = {}) => {
   return await axios.get(API_URL, { params });
@@ -39,5 +40,5 @@ export const removeWorker = async (projectId, workerId) => {
 };
 
 export const getHomeownerProjects = async () => {
-  return await axios.get(`http://localhost:5000/api/homeowner/projects`);
+  return await axios.get(`${BASE_API_URL}/homeowner/projects`);
 };

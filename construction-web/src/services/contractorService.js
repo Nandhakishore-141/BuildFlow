@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_URL as BASE_API_URL } from './apiClient';
 
-const API_URL = 'http://localhost:5000/api/contractor';
+const API_URL = `${BASE_API_URL}/contractor`;
 
 export const getDashboardStats = async () => {
   const response = await axios.get(`${API_URL}/dashboard`);

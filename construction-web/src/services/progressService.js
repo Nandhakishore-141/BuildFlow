@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_URL as BASE_API_URL } from './apiClient';
 
-const API_URL = 'http://localhost:5000/api/worker/progress';
+const API_URL = `${BASE_API_URL}/worker/progress`;
 
 export const getProgress = async () => {
   const response = await axios.get(API_URL);
@@ -13,6 +14,6 @@ export const createProgress = async (data) => {
 };
 
 export const getHomeownerProgress = async (projectId) => {
-  const response = await axios.get(`http://localhost:5000/api/homeowner/projects/${projectId}/progress`);
+  const response = await axios.get(`${BASE_API_URL}/homeowner/projects/${projectId}/progress`);
   return response.data;
 };

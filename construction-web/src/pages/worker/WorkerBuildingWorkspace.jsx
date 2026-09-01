@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { API_URL } from '@/services/apiClient';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SectionCard } from '@/components/common/SectionCard';
 import { TablePlaceholder } from '@/components/common/TablePlaceholder';
@@ -23,7 +25,6 @@ import {
   ShieldCheck,
   UserCheck
 } from 'lucide-react';
-import axios from 'axios';
 
 const PROJECT_COVER_IMAGES = [
   'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b7?w=1200',
@@ -44,7 +45,7 @@ const WorkerBuildingWorkspaceContent = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await axios.get(`http://localhost:5000/api/projects/${id}/building-workspace`);
+      const res = await axios.get(`${API_URL}/projects/${id}/building-workspace`);
       setWorkspace(res.data?.data || null);
     } catch (err) {
       console.error("Failed to load building workspace:", err);

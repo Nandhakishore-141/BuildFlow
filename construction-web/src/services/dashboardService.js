@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:5000/api';
+import { API_URL } from './apiClient';
 
 export const getDashboardStats = async (role = 'homeowner') => {
   const endpoint = role.toLowerCase() === 'contractor' ? '/contractor/dashboard' : role.toLowerCase() === 'worker' ? '/worker/dashboard' : '/homeowner/dashboard';

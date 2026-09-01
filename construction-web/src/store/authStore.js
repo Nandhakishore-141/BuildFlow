@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import axios from 'axios';
 import * as adminService from '@/services/adminService';
+import { API_URL } from '@/services/apiClient';
 
-const API_URL = 'http://localhost:5000/api/auth';
+const AUTH_API_URL = `${API_URL}/auth`;
 
 // Helper to get initial state from localStorage
 const getLocalStorage = (key, defaultValue) => {
@@ -62,7 +63,7 @@ export const useAuthStore = create((set, get) => ({
     
     set({ isLoading: true });
     try {
-      const response = await axios.get(`${API_URL}/me`);
+      const response = await axios.get(`${AUTH_API_URL}/me`);
       const user = response.data.data.user;
       set({ user, isInitialized: true, isLoading: false });
       setLocalStorage('buildflow_current_user', user);
@@ -100,7 +101,7 @@ export const useAuthStore = create((set, get) => ({
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/login`, { email, password });
+      const response = await axios.post(`${AUTH_API_URL}/login`, { email, password });
       const { user, tokens } = response.data.data;
       
       set({ 
@@ -201,7 +202,7 @@ export const useAuthStore = create((set, get) => ({
   register: async (userData) => {
     set({ isLoading: true, error: null });
     try {
-      await axios.post(`${API_URL}/register`, userData);
+      await axios.post(`${AUTH_API_URL}/register`, userData);
       set({ isLoading: false, error: null });
       return { success: true };
     } catch (err) {

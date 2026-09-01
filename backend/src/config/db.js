@@ -10,7 +10,6 @@ const sslConfig =
   process.env.DB_SSL === 'false'
     ? undefined
     : {
-        minVersion: 'TLSv1.2',
         rejectUnauthorized: true,
       };
 

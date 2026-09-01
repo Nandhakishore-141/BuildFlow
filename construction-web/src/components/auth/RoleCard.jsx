@@ -12,43 +12,43 @@ export function RoleCard({
 }) {
   return (
     <motion.div
-      whileHover={{ y: -4, scale: 1.01 }}
+      whileHover={{ y: -3, scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       onClick={onSelect}
       className={cn(
-        'relative flex flex-col p-6 rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden',
+        'relative flex flex-col p-6 rounded-2xl border transition-all duration-200 cursor-pointer overflow-hidden backdrop-blur-md',
         isSelected
-          ? 'bg-neutral-900 border-neutral-800 text-white shadow-xl shadow-neutral-950/20'
-          : 'bg-white border-neutral-200 hover:border-gold-300 hover:shadow-lg hover:shadow-gold-500/5 text-neutral-800'
+          ? 'bg-zinc-900 border-gold-500/80 text-zinc-100 shadow-xl shadow-gold-500/5 ring-1 ring-gold-500/50'
+          : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/90 text-zinc-300'
       )}
     >
       {/* Checkmark indicator */}
       <div
         className={cn(
-          'absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-300',
+          'absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200',
           isSelected
-            ? 'bg-gold-500 border-gold-500 text-neutral-900 scale-100'
-            : 'border-neutral-300 bg-neutral-50 scale-75 opacity-0 group-hover:opacity-100'
+            ? 'bg-gold-500 border-gold-500 text-zinc-950 scale-100'
+            : 'border-zinc-700 bg-zinc-800 scale-75 opacity-0 group-hover:opacity-100'
         )}
       >
-        {isSelected && <HiOutlineCheck className="w-4 h-4 text-white stroke-[3px]" />}
+        {isSelected && <HiOutlineCheck className="w-4 h-4 text-zinc-950 stroke-[3px]" />}
       </div>
 
       {/* Emoji Header */}
       <div
         className={cn(
-          'w-12 h-12 text-2xl rounded-xl flex items-center justify-center mb-5 shrink-0 select-none',
-          isSelected ? 'bg-neutral-800' : 'bg-gold-50'
+          'w-12 h-12 text-2xl rounded-xl flex items-center justify-center mb-5 shrink-0 select-none border',
+          isSelected ? 'bg-gold-500/15 border-gold-500/30' : 'bg-zinc-800 border-zinc-700/60'
         )}
       >
         {emoji}
       </div>
 
       {/* Content */}
-      <h3 className={cn('text-lg font-bold mb-1.5', isSelected ? 'text-white' : 'text-neutral-900')}>
+      <h3 className="text-lg font-bold mb-1.5 text-zinc-100">
         {role}
       </h3>
-      <p className={cn('text-xs mb-5 leading-relaxed', isSelected ? 'text-neutral-400' : 'text-neutral-500')}>
+      <p className="text-xs mb-5 leading-relaxed text-zinc-400">
         {description}
       </p>
 
@@ -59,12 +59,12 @@ export function RoleCard({
             <div
               className={cn(
                 'w-4 h-4 rounded-full flex items-center justify-center shrink-0',
-                isSelected ? 'bg-gold-500/20 text-gold-400' : 'bg-gold-50 text-gold-600'
+                isSelected ? 'bg-gold-500/20 text-gold-400' : 'bg-zinc-800 text-zinc-500'
               )}
             >
               <HiOutlineCheck className="w-2.5 h-2.5" />
             </div>
-            <span className={cn('text-xs', isSelected ? 'text-neutral-300' : 'text-neutral-600')}>
+            <span className={cn('text-xs', isSelected ? 'text-zinc-200' : 'text-zinc-400')}>
               {feature}
             </span>
           </li>
@@ -77,8 +77,8 @@ export function RoleCard({
         className={cn(
           'w-full py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase transition-colors cursor-pointer',
           isSelected
-            ? 'bg-gold-500 hover:bg-gold-600 text-neutral-950 font-extrabold'
-            : 'bg-neutral-50 hover:bg-neutral-100 text-neutral-700'
+            ? 'bg-gold-500 hover:bg-gold-400 text-zinc-950 font-extrabold'
+            : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
         )}
       >
         Continue

@@ -87,7 +87,7 @@ const AdminUsersContent = () => {
         title="User Management" 
         description="View, search, manage, and impersonate registered platform users."
         action={
-          <Button variant="outline" size="sm" onClick={fetchUsers} className="gap-2">
+          <Button variant="outline" size="sm" onClick={fetchUsers} className="gap-2 text-xs">
             <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
@@ -106,16 +106,16 @@ const AdminUsersContent = () => {
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-            <Filter className="w-4 h-4 text-neutral-400 shrink-0" />
-            <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Role:</span>
+            <Filter className="w-4 h-4 text-zinc-500 shrink-0" />
+            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Role:</span>
             {['All', 'Contractor', 'Homeowner', 'Worker', 'Admin'].map(r => (
               <button
                 key={r}
                 onClick={() => setRoleFilter(r)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 cursor-pointer ${
                   roleFilter === r 
-                    ? 'bg-neutral-900 text-white' 
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                    ? 'bg-gold-500 text-zinc-950 shadow-sm shadow-gold-500/20' 
+                    : 'bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 border border-zinc-700/50'
                 }`}
               >
                 {r}
@@ -131,10 +131,10 @@ const AdminUsersContent = () => {
         ) : users.length === 0 ? (
           <EmptyState icon={Users} title="No users found" description={search ? `No users match "${search}".` : "No registered users in this role category."} />
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-neutral-200">
+          <div className="overflow-x-auto rounded-lg border border-zinc-800">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b bg-neutral-50 text-neutral-600 font-medium">
+                <tr className="border-b border-zinc-800 bg-zinc-950/50 text-zinc-400 font-medium">
                   <th className="p-4">Name / Email</th>
                   <th className="p-4">Role</th>
                   <th className="p-4">Company / Phone</th>
@@ -142,23 +142,23 @@ const AdminUsersContent = () => {
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-200 bg-white">
+              <tbody className="divide-y divide-zinc-800/80 bg-zinc-900/30">
                 {users.map(u => (
-                  <tr key={u.id} className="hover:bg-neutral-50/80 transition-colors">
-                    <td className="p-4 font-bold text-neutral-900">
+                  <tr key={u.id} className="hover:bg-zinc-800/40 transition-colors">
+                    <td className="p-4 font-bold text-zinc-100">
                       {u.name}
-                      <span className="block text-xs font-normal text-neutral-500">{u.email}</span>
+                      <span className="block text-xs font-normal text-zinc-400">{u.email}</span>
                     </td>
                     <td className="p-4">
-                      <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-neutral-100 text-neutral-800 border border-neutral-200">
+                      <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700/60">
                         {u.role}
                       </span>
                     </td>
-                    <td className="p-4 text-neutral-600">
+                    <td className="p-4 text-zinc-300">
                       {u.company_name || u.phone || 'N/A'}
                     </td>
                     <td className="p-4">
-                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${Boolean(u.is_verified) ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-rose-100 text-rose-800 border-rose-200'}`}>
+                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${Boolean(u.is_verified) ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
                         {Boolean(u.is_verified) ? 'Active' : 'Suspended'}
                       </span>
                     </td>
@@ -170,7 +170,7 @@ const AdminUsersContent = () => {
                             size="sm" 
                             onClick={() => handleLoginAs(u)}
                             disabled={impersonatingId === u.id}
-                            className="bg-gold-500 hover:bg-gold-600 text-white font-bold gap-1 text-xs"
+                            className="bg-gold-500 hover:bg-gold-400 text-zinc-950 font-bold gap-1 text-xs"
                           >
                             <LogIn className="w-3.5 h-3.5" />
                             {impersonatingId === u.id ? 'Connecting...' : 'Login As'}
@@ -180,7 +180,7 @@ const AdminUsersContent = () => {
                           variant="outline" 
                           size="sm" 
                           onClick={() => handleStatusChange(u.id, u.is_verified)}
-                          className={Boolean(u.is_verified) ? 'text-rose-600 hover:bg-rose-50 text-xs' : 'text-emerald-600 hover:bg-emerald-50 text-xs'}
+                          className={Boolean(u.is_verified) ? 'text-rose-400 hover:bg-rose-500/10 border-rose-500/30 text-xs' : 'text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 text-xs'}
                         >
                           {Boolean(u.is_verified) ? 'Suspend' : 'Activate'}
                         </Button>

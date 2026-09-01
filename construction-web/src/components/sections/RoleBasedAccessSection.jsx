@@ -13,20 +13,20 @@ function RoleCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ delay: index * 0.12, duration: 0.5 }}
+      transition={{ delay: index * 0.08, duration: 0.35 }}
       className={cn(
-        'relative rounded-2xl p-7 border transition-all duration-300 overflow-hidden',
+        'relative rounded-2xl p-7 border transition-all duration-200 overflow-hidden backdrop-blur-sm',
         isContractor
-          ? 'bg-neutral-900 border-neutral-700 text-white shadow-2xl shadow-neutral-900/30 scale-[1.02]'
-          : 'bg-white border-neutral-200 hover:border-gold-200 hover:shadow-lg hover:shadow-gold-500/5',
+          ? 'bg-zinc-900 border-gold-500/60 text-zinc-100 shadow-2xl shadow-black/40 ring-1 ring-gold-500/30'
+          : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/90 text-zinc-200 shadow-sm',
       )}
     >
       {isContractor && (
         <div className="absolute top-4 right-4">
-          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-gold-500 text-white">
+          <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-gold-500 text-zinc-950">
             Primary
           </span>
         </div>
@@ -34,8 +34,8 @@ function RoleCard({
 
       <div
         className={cn(
-          'w-12 h-12 rounded-xl flex items-center justify-center mb-5',
-          isContractor ? 'bg-gold-500' : 'bg-gold-50',
+          'w-12 h-12 rounded-xl flex items-center justify-center mb-5 border',
+          isContractor ? 'bg-gold-500 text-zinc-950 border-gold-400' : 'bg-gold-500/10 text-gold-400 border-gold-500/20',
         )}
       >
         <svg
@@ -43,7 +43,7 @@ function RoleCard({
           height="22"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={isContractor ? 'white' : '#D4AF37'}
+          stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -73,20 +73,10 @@ function RoleCard({
         </svg>
       </div>
 
-      <h3
-        className={cn(
-          'text-xl font-bold mb-2',
-          isContractor ? 'text-white' : 'text-neutral-900',
-        )}
-      >
+      <h3 className="text-xl font-bold mb-2 text-zinc-100">
         {role.role}
       </h3>
-      <p
-        className={cn(
-          'text-sm mb-6 leading-relaxed',
-          isContractor ? 'text-neutral-400' : 'text-neutral-500',
-        )}
-      >
+      <p className="text-sm mb-6 leading-relaxed text-zinc-400">
         {role.description}
       </p>
 
@@ -98,17 +88,12 @@ function RoleCard({
                 'w-5 h-5 rounded-full flex items-center justify-center shrink-0',
                 isContractor
                   ? 'bg-gold-500/20 text-gold-400'
-                  : 'bg-gold-50 text-gold-600',
+                  : 'bg-zinc-800 text-gold-400',
               )}
             >
               <HiOutlineCheck className="w-3 h-3" />
             </div>
-            <span
-              className={cn(
-                'text-sm',
-                isContractor ? 'text-neutral-300' : 'text-neutral-600',
-              )}
-            >
+            <span className="text-sm text-zinc-300">
               {perm}
             </span>
           </li>

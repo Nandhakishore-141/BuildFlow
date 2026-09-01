@@ -11,12 +11,12 @@ export function AuthButton({
   onClick,
   ...props
 }) {
-  const baseStyles = 'w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+  const baseStyles = 'w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none';
   
   const variants = {
-    primary: 'bg-gold-500 hover:bg-gold-600 text-white shadow-md shadow-gold-500/10 active:scale-[0.98]',
-    outline: 'border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 active:scale-[0.98]',
-    ghost: 'hover:bg-neutral-100 text-neutral-600 active:scale-[0.98]',
+    primary: 'bg-gold-500 hover:bg-gold-400 text-zinc-950 shadow-lg shadow-gold-500/20 active:scale-[0.98]',
+    outline: 'border border-zinc-700 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 active:scale-[0.98]',
+    ghost: 'hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 active:scale-[0.98]',
   };
 
   return (

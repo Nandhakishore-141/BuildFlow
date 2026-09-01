@@ -13,7 +13,7 @@ function FAQAccordionItem({
   onToggle,
 }) {
   return (
-    <div className="border-b border-neutral-100 last:border-0">
+    <div className="border-b border-zinc-800/80 last:border-0">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between py-5 text-left group cursor-pointer"
@@ -21,8 +21,8 @@ function FAQAccordionItem({
       >
         <span
           className={cn(
-            'text-base font-medium transition-colors duration-200',
-            isOpen ? 'text-neutral-900' : 'text-neutral-600 group-hover:text-neutral-900',
+            'text-base font-semibold transition-colors duration-200',
+            isOpen ? 'text-zinc-100' : 'text-zinc-300 group-hover:text-zinc-100',
           )}
         >
           {question}
@@ -35,7 +35,7 @@ function FAQAccordionItem({
           <HiOutlineChevronDown
             className={cn(
               'w-5 h-5 transition-colors',
-              isOpen ? 'text-gold-500' : 'text-neutral-400',
+              isOpen ? 'text-gold-400' : 'text-zinc-500',
             )}
           />
         </motion.div>
@@ -47,10 +47,10 @@ function FAQAccordionItem({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <p className="pb-5 text-sm text-neutral-500 leading-relaxed pr-12">
+            <p className="pb-5 text-sm text-zinc-400 leading-relaxed pr-12">
               {answer}
             </p>
           </motion.div>
@@ -75,7 +75,7 @@ export function FAQSection() {
         description="Everything you need to know about BuildFlow."
       />
 
-      <div className="max-w-2xl mx-auto bg-white rounded-xl border border-neutral-200 px-6">
+      <div className="max-w-2xl mx-auto bg-zinc-900/70 rounded-xl border border-zinc-800 px-6 backdrop-blur-sm shadow-xl shadow-black/20">
         {FAQ_ITEMS.map((item, i) => (
           <FAQAccordionItem
             key={i}

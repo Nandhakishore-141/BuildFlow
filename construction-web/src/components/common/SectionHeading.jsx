@@ -5,7 +5,6 @@ export function SectionHeading({
   title,
   description,
   align = 'center',
-  dark = false,
 }) {
   return (
     <div
@@ -15,25 +14,15 @@ export function SectionHeading({
       )}
     >
       {label && (
-        <span className="inline-block mb-3 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold-600 bg-gold-50 rounded-full border border-gold-100">
+        <span className="inline-block mb-3 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-gold-400 bg-gold-500/10 rounded-full border border-gold-500/20 shadow-xs">
           {label}
         </span>
       )}
-      <h2
-        className={cn(
-          'text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight',
-          dark ? 'text-white' : 'text-neutral-900',
-        )}
-      >
+      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-zinc-100">
         {title}
       </h2>
       {description && (
-        <p
-          className={cn(
-            'mt-4 text-lg leading-relaxed',
-            dark ? 'text-neutral-400' : 'text-neutral-500',
-          )}
-        >
+        <p className="mt-4 text-base sm:text-lg leading-relaxed text-zinc-400">
           {description}
         </p>
       )}

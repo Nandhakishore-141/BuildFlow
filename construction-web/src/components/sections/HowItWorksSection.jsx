@@ -14,31 +14,31 @@ export function HowItWorksSection() {
 
       <div className="relative max-w-3xl mx-auto">
         {/* Vertical Line */}
-        <div className="absolute left-6 md:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-gold-300 via-gold-200 to-neutral-200" />
+        <div className="absolute left-6 md:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-gold-500/40 via-gold-500/20 to-zinc-800" />
 
         <div className="space-y-2">
           {HOW_IT_WORKS_STEPS.map((step, i) => (
             <motion.div
               key={step.step}
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -15 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: '-40px' }}
-              transition={{ delay: i * 0.08, duration: 0.4 }}
+              transition={{ delay: i * 0.06, duration: 0.3 }}
               className="relative flex items-start gap-5 md:gap-6 group"
             >
               {/* Step Number */}
-              <div className="relative z-10 flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-gold-200 bg-white group-hover:border-gold-400 transition-colors duration-300 shrink-0">
-                <span className="text-sm md:text-base font-bold text-gold-600">
+              <div className="relative z-10 flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-gold-500/40 bg-zinc-900 group-hover:border-gold-500 transition-colors duration-200 shrink-0 shadow-md">
+                <span className="text-sm md:text-base font-bold text-gold-400">
                   {step.step}
                 </span>
               </div>
 
               {/* Content */}
               <div className="pt-2 md:pt-3 pb-8">
-                <h3 className="text-base md:text-lg font-semibold text-neutral-900 mb-1">
+                <h3 className="text-base md:text-lg font-bold text-zinc-100 mb-1">
                   {step.title}
                 </h3>
-                <p className="text-sm text-neutral-500 leading-relaxed">
+                <p className="text-sm text-zinc-400 leading-relaxed">
                   {step.description}
                 </p>
               </div>

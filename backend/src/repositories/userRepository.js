@@ -58,7 +58,7 @@ export const update = async (id, updates) => {
   const keys = Object.keys(updates);
   if (keys.length === 0) return null;
 
-  const setClause = keys.map((key, index) => `"${key}" = $${index + 1}`).join(', ');
+  const setClause = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
   const values = Object.values(updates);
   values.push(id);
 

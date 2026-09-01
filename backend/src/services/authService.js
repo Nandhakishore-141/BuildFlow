@@ -121,17 +121,17 @@ export const googleRegister = async (token, onboardingData) => {
   
   const userRecord = {
     id: userId,
-    name: payload.name,
+    name: payload.name || payload.email?.split('@')[0] || 'User',
     email: payload.email,
     passwordHash: null,
     role,
-    phone,
+    phone: phone || '',
     companyName: role === 'Contractor' ? companyName : null,
     isVerified: true,
     verificationToken: null,
     provider: 'google',
     googleId: payload.sub,
-    profilePhoto: payload.picture
+    profilePhoto: payload.picture || null
   };
 
   const createdUser = await userRepository.create(userRecord);

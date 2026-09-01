@@ -195,21 +195,19 @@ export const assignWorker = async (projectId, workerId) => {
   const query = `
     INSERT INTO project_members (project_id, worker_id)
     VALUES ($1, $2)
-    ON CONFLICT (project_id, worker_id) DO NOTHING
-    RETURNING *;
+    ON DUPLICATE KEY UPDATE worker_id = worker_id
   `;
-  const result = await db.query(query, [projectId, workerId]);
-  return result.rows[0];
+  await db.query(query, [projectId, workerId]);
+  return { project_id: projectId, worker_id: workerId };
 };
 
 export const removeWorker = async (projectId, workerId) => {
   const query = `
     DELETE FROM project_members
     WHERE project_id = $1 AND worker_id = $2
-    RETURNING *;
   `;
-  const result = await db.query(query, [projectId, workerId]);
-  return result.rows[0];
+  await db.query(query, [projectId, workerId]);
+  return { project_id: projectId, worker_id: workerId };
 };
 
 export const getProjectWorkers = async (projectId) => {

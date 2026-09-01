@@ -54,6 +54,7 @@ function normalizeSqlAndParams(sql, params = []) {
     .replace(/INTERVAL\s*'(\d+)\s*days'/gi, 'INTERVAL $1 DAY')
     .replace(/\bRETURNING\b[\s\S]*?(?=;|\)|$)/gi, '')
     .replace(/ON\s+CONFLICT\s*(\([^)]*\))?\s*DO\s+NOTHING/gi, 'ON DUPLICATE KEY UPDATE id=id')
+    .replace(/ON\s+CONFLICT\s*(\([^)]*\))?\s*DO\s+UPDATE\s+SET/gi, 'ON DUPLICATE KEY UPDATE')
     .replace(/gen_random_uuid\(\)/gi, 'UUID()');
 
   return { sql: cleanSql, params: reorderedParams };
@@ -95,7 +96,8 @@ const db = {
         fields
       };
     } catch (error) {
-      console.error('MySQL Query Execution Error:', error.message, '\nSQL:', formattedSql);
+      const errMsg = error.code ? `[${error.code}] ${error.message || 'Connection timed out or refused'}` : (error.message || String(error));
+      console.error('MySQL Query Execution Error:', errMsg, '\nSQL:', formattedSql);
       throw error;
     }
   }

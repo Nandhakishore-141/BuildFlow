@@ -30,9 +30,12 @@ const startServer = async () => {
     console.log(`✓ Repository Layer Ready`);
     console.log(`✓ Server Ready`);
   } catch (error) {
+    const errorDetails = error.code ? `[${error.code}] ${error.message || 'Network unreachable'}` : (error.message || String(error));
     console.error('⚠️ Warning: Database connection check encountered an error:');
-    console.error(error.message);
-    console.error('Please verify your DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, and DB_NAME environment variables.');
+    console.error(errorDetails);
+    if (error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
+      console.error('💡 Tip: Your network/WiFi may be blocking port 4000, or your IP address is not whitelisted in TiDB Cloud Security settings.');
+    }
   }
 
   // Unhandled Promise Rejections & Uncaught Exceptions Handler

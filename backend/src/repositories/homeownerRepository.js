@@ -275,17 +275,17 @@ export const createInvitation = async (invitationData) => {
   const query = `
     INSERT INTO contractor_invitations (id, project_id, homeowner_id, contractor_id, status)
     VALUES ($1, $2, $3, $4, 'pending')
-    ON CONFLICT (project_id, contractor_id) DO UPDATE SET status = 'pending', sent_at = CURRENT_TIMESTAMP
-    RETURNING *;
+    ON DUPLICATE KEY UPDATE status = 'pending', sent_at = CURRENT_TIMESTAMP
   `;
-  const res = await db.query(query, [id, project_id, homeowner_id, contractor_id]);
+  await db.query(query, [id, project_id, homeowner_id, contractor_id]);
 
   await db.query(`
     INSERT INTO notifications (user_id, title, message, type)
     VALUES ($1, 'New Project Invitation', 'You have received an invitation from a homeowner to build their project.', 'invitation')
   `, [contractor_id]);
 
-  return res.rows[0];
+  const res = await db.query('SELECT * FROM contractor_invitations WHERE project_id = $1 AND contractor_id = $2', [project_id, contractor_id]);
+  return res.rows[0] || { id, project_id, homeowner_id, contractor_id, status: 'pending' };
 };
 
 export const getProposalsForProject = async (projectId, ownerId) => {

@@ -77,24 +77,22 @@ const AdminAnalyticsContent = () => {
     );
   }
 
-  const {
-    totalUsers = 0,
-    contractorsCount = 0,
-    homeownersCount = 0,
-    workersCount = 0,
-    activeProjects = 0,
-    completedProjects = 0,
-    planningProjects = 0,
-    suspendedProjects = 0,
-    totalBudget = 0,
-    totalExpenses = 0,
-    materialsLowInStock = 0,
-    attendanceToday = 0,
-    pendingNotifications = 0,
-    recentRegistrations = [],
-    expensesByCategory = [],
-    projectsByStatus = []
-  } = data || {};
+  const totalUsers = Number(data?.totalUsers) || 0;
+  const contractorsCount = Number(data?.contractorsCount) || 0;
+  const homeownersCount = Number(data?.homeownersCount) || 0;
+  const workersCount = Number(data?.workersCount) || 0;
+  const activeProjects = Number(data?.activeProjects) || 0;
+  const completedProjects = Number(data?.completedProjects) || 0;
+  const planningProjects = Number(data?.planningProjects) || 0;
+  const suspendedProjects = Number(data?.suspendedProjects) || 0;
+  const totalBudget = Number(data?.totalBudget) || 0;
+  const totalExpenses = Number(data?.totalExpenses) || 0;
+  const materialsLowInStock = Number(data?.materialsLowInStock) || 0;
+  const attendanceToday = Number(data?.attendanceToday) || 0;
+  const pendingNotifications = Number(data?.pendingNotifications) || 0;
+  const recentRegistrations = Array.isArray(data?.recentRegistrations) ? data.recentRegistrations : [];
+  const expensesByCategory = Array.isArray(data?.expensesByCategory) ? data.expensesByCategory : [];
+  const projectsByStatus = Array.isArray(data?.projectsByStatus) ? data.projectsByStatus : [];
 
   return (
     <div className="space-y-6">

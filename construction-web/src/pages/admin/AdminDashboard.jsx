@@ -73,16 +73,16 @@ const AdminDashboardContent = () => {
     );
   }
 
-  const totalUsers = data?.totalUsers ?? 0;
-  const activeProjects = data?.activeProjects ?? 0;
-  const completedProjects = data?.completedProjects ?? 0;
-  const verifiedContractors = data?.verifiedContractors ?? 0;
-  const pendingContractors = data?.pendingContractors ?? 0;
-  const workersAssignedToday = data?.workersAssignedToday ?? 0;
-  const totalBudget = data?.totalBudget ?? 0;
-  const totalExpenses = data?.totalExpenses ?? 0;
-  const recentRegistrations = data?.recentRegistrations ?? [];
-  const recentProjects = data?.recentProjects ?? [];
+  const totalUsers = Number(data?.totalUsers) || 0;
+  const activeProjects = Number(data?.activeProjects) || 0;
+  const completedProjects = Number(data?.completedProjects) || 0;
+  const verifiedContractors = Number(data?.verifiedContractors) || 0;
+  const pendingContractors = Number(data?.pendingContractors) || 0;
+  const workersAssignedToday = Number(data?.workersAssignedToday) || 0;
+  const totalBudget = Number(data?.totalBudget) || 0;
+  const totalExpenses = Number(data?.totalExpenses) || 0;
+  const recentRegistrations = Array.isArray(data?.recentRegistrations) ? data.recentRegistrations : [];
+  const recentProjects = Array.isArray(data?.recentProjects) ? data.recentProjects : [];
 
   return (
     <div className="space-y-6">

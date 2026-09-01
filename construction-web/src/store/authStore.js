@@ -213,6 +213,80 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  googleVerify: async (credential) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`${AUTH_API_URL}/google/verify`, { credential });
+      const data = response.data?.data;
+
+      if (data?.requires_onboarding) {
+        set({ isLoading: false, error: null });
+        return {
+          success: true,
+          requires_onboarding: true,
+          googleProfile: data.googleProfile
+        };
+      }
+
+      const { user, tokens } = data;
+      set({
+        user,
+        accessToken: tokens.accessToken,
+        isLoading: false,
+        error: null,
+        isImpersonating: false,
+        originalAdmin: null,
+        originalAdminToken: null
+      });
+
+      setLocalStorage('buildflow_current_user', user);
+      setLocalStorage('buildflow_access_token', tokens.accessToken);
+      removeLocalStorage('constructiq_is_impersonating');
+      removeLocalStorage('constructiq_original_admin');
+      removeLocalStorage('constructiq_original_admin_token');
+
+      return { success: true, requires_onboarding: false };
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || err.message || 'Google Login failed';
+      set({ isLoading: false, error: errorMsg });
+      return { success: false, error: errorMsg };
+    }
+  },
+
+  googleRegister: async (credential, onboardingData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`${AUTH_API_URL}/google/register`, {
+        credential,
+        ...onboardingData
+      });
+      const { user, tokens } = response.data?.data;
+
+      set({
+        user,
+        accessToken: tokens.accessToken,
+        isLoading: false,
+        error: null,
+        isImpersonating: false,
+        originalAdmin: null,
+        originalAdminToken: null
+      });
+
+      setLocalStorage('buildflow_current_user', user);
+      setLocalStorage('buildflow_access_token', tokens.accessToken);
+      removeLocalStorage('constructiq_is_impersonating');
+      removeLocalStorage('constructiq_original_admin');
+      removeLocalStorage('constructiq_original_admin_token');
+
+      return { success: true };
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || err.message || 'Google Registration failed';
+      const errors = err.response?.data?.errors;
+      set({ isLoading: false, error: errorMsg });
+      return { success: false, error: errorMsg, errors };
+    }
+  },
+
   logout: () => {
     removeLocalStorage('buildflow_current_user');
     removeLocalStorage('buildflow_access_token');

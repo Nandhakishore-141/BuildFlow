@@ -8,7 +8,7 @@ export const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col overflow-hidden font-sans">
+    <div className="min-h-screen bg-zinc-950 flex flex-col overflow-hidden font-sans">
       <ImpersonationBanner />
       
       <div className="flex-1 flex overflow-hidden">

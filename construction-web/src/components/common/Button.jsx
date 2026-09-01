@@ -3,12 +3,12 @@ import { cn } from '@/utils/cn';
 
 const variantStyles = {
   primary:
-    'bg-gold-500 text-white hover:bg-gold-600 shadow-lg shadow-gold-500/20 hover:shadow-gold-500/30',
+    'bg-gold-500 text-zinc-950 hover:bg-gold-400 shadow-lg shadow-gold-500/15 hover:shadow-gold-500/25 font-semibold',
   secondary:
-    'bg-neutral-900 text-white hover:bg-neutral-800 shadow-lg shadow-neutral-900/20',
+    'bg-zinc-800 text-zinc-100 hover:bg-zinc-700 shadow-lg shadow-black/20',
   outline:
-    'border border-neutral-200 text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300',
-  ghost: 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100',
+    'border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 hover:border-zinc-600',
+  ghost: 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800',
 };
 
 const sizeStyles = {

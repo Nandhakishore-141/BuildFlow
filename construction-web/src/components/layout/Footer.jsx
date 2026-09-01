@@ -17,7 +17,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-neutral-950 text-neutral-400 border-t border-neutral-800">
+    <footer className="bg-zinc-950 text-zinc-400 border-t border-zinc-800/80">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
         <div className="py-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
@@ -40,11 +40,11 @@ export function Footer() {
                   <path d="M10 20v-6h4v6" />
                 </svg>
               </div>
-              <span className="text-lg font-bold text-white tracking-tight">
+              <span className="text-lg font-bold text-zinc-100 tracking-tight">
                 Build<span className="gradient-gold-text">Flow</span>
               </span>
             </a>
-            <p className="text-sm leading-relaxed max-w-xs mb-6">
+            <p className="text-sm leading-relaxed max-w-xs mb-6 text-zinc-500">
               The modern construction management platform. Simplify projects,
               empower teams, deliver results.
             </p>
@@ -54,7 +54,7 @@ export function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="flex items-center justify-center w-9 h-9 rounded-lg bg-neutral-800/50 text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors duration-200"
+                  className="flex items-center justify-center w-9 h-9 rounded-lg bg-zinc-800/50 text-zinc-500 hover:text-zinc-100 hover:bg-zinc-800 transition-colors duration-200"
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -65,7 +65,7 @@ export function Footer() {
           {/* Link Columns */}
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.title}>
-              <h4 className="text-sm font-semibold text-white mb-4">
+              <h4 className="text-sm font-semibold text-zinc-200 mb-4">
                 {section.title}
               </h4>
               <ul className="space-y-2.5">
@@ -73,7 +73,7 @@ export function Footer() {
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-sm hover:text-white transition-colors duration-200"
+                      className="text-sm text-zinc-500 hover:text-zinc-200 transition-colors duration-200"
                     >
                       {link.label}
                     </a>
@@ -85,26 +85,26 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="py-6 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-neutral-500">
+        <div className="py-6 border-t border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-zinc-600">
             © {currentYear} BuildFlow. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a
               href="#"
-              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
+              className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
             >
               Privacy Policy
             </a>
             <a
               href="#"
-              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
+              className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
             >
               Terms of Service
             </a>
             <a
               href="#"
-              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
+              className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
             >
               Cookies
             </a>

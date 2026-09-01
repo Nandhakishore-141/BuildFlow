@@ -82,27 +82,27 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
       {/* Mobile Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-neutral-900/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       <aside 
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-neutral-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-zinc-950 border-r border-zinc-800/80 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="h-16 flex items-center px-6 border-b border-neutral-100">
+        <div className="h-16 flex items-center px-6 border-b border-zinc-800/60">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gold-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg leading-none">C</span>
+            <div className="w-8 h-8 gradient-gold rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg leading-none">B</span>
             </div>
-            <span className="text-xl font-bold text-neutral-900 tracking-tight">ConstructIQ</span>
+            <span className="text-xl font-bold text-zinc-100 tracking-tight">Build<span className="gradient-gold-text">Flow</span></span>
           </Link>
         </div>
 
         <div className="py-6 px-4 h-[calc(100vh-4rem)] overflow-y-auto">
-          <p className="px-3 text-xs font-bold text-neutral-400 uppercase tracking-wider mb-4">
+          <p className="px-3 text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4">
             {user?.role} Menu
           </p>
           <nav className="space-y-1">
@@ -114,14 +114,14 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
                 <Link
                   key={link.path + link.name}
                   to={link.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors ${
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-all duration-200 ${
                     isActive 
-                      ? 'bg-gold-50 text-gold-700' 
-                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                      ? 'bg-gold-500/10 text-gold-400 border-l-2 border-gold-500 ml-0' 
+                      : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-gold-600' : 'text-neutral-400'}`} />
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-gold-500' : 'text-zinc-500'}`} />
                   {link.name}
                 </Link>
               );

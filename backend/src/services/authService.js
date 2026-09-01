@@ -200,7 +200,7 @@ export const register = async (userData) => {
       role,
       phone,
       companyName: role === 'Contractor' ? companyName : null,
-      isVerified: false,
+      isVerified: true,
       verificationToken,
       provider: 'local'
     };

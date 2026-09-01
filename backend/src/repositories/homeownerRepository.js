@@ -432,8 +432,8 @@ export const getNotifications = async (ownerId, limit = 50, offset = 0) => {
     ORDER BY created_at DESC
     LIMIT $2 OFFSET $3;
   `;
-  const countQuery = `SELECT COUNT(*) FROM notifications WHERE user_id = $1`;
-  const unreadQuery = `SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND is_read = false`;
+  const countQuery = `SELECT COUNT(*) as count FROM notifications WHERE user_id = $1`;
+  const unreadQuery = `SELECT COUNT(*) as count FROM notifications WHERE user_id = $1 AND is_read = false`;
 
   const [data, count, unreadCount] = await Promise.all([
     db.query(query, [ownerId, limit, offset]),
@@ -443,8 +443,8 @@ export const getNotifications = async (ownerId, limit = 50, offset = 0) => {
 
   return {
     data: data.rows,
-    total: parseInt(count.rows[0].count, 10),
-    unread: parseInt(unreadCount.rows[0].count, 10)
+    total: parseInt(count.rows[0]?.count ?? count.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+    unread: parseInt(unreadCount.rows[0]?.count ?? unreadCount.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0
   };
 };
 

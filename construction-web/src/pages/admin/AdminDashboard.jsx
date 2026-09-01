@@ -73,18 +73,16 @@ const AdminDashboardContent = () => {
     );
   }
 
-  const {
-    totalUsers = 0,
-    activeProjects = 0,
-    completedProjects = 0,
-    verifiedContractors = 0,
-    pendingContractors = 0,
-    workersAssignedToday = 0,
-    totalBudget = 0,
-    totalExpenses = 0,
-    recentRegistrations = [],
-    recentProjects = []
-  } = data || {};
+  const totalUsers = data?.totalUsers ?? 0;
+  const activeProjects = data?.activeProjects ?? 0;
+  const completedProjects = data?.completedProjects ?? 0;
+  const verifiedContractors = data?.verifiedContractors ?? 0;
+  const pendingContractors = data?.pendingContractors ?? 0;
+  const workersAssignedToday = data?.workersAssignedToday ?? 0;
+  const totalBudget = data?.totalBudget ?? 0;
+  const totalExpenses = data?.totalExpenses ?? 0;
+  const recentRegistrations = data?.recentRegistrations ?? [];
+  const recentProjects = data?.recentProjects ?? [];
 
   return (
     <div className="space-y-6">

@@ -35,9 +35,10 @@ export const updateProfile = async (userId, updateData) => {
     UPDATE users
     SET ${setClauses.join(', ')}
     WHERE id = $${paramIndex}
-    RETURNING id, name, email, role, phone, company_name, is_verified, provider, profile_photo;
   `;
 
-  const result = await db.query(query, values);
+  await db.query(query, values);
+  const selectQuery = `SELECT id, name, email, role, phone, company_name, is_verified, provider, profile_photo FROM users WHERE id = $1`;
+  const result = await db.query(selectQuery, [userId]);
   return result.rows[0];
 };

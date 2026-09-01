@@ -52,7 +52,7 @@ function normalizeSqlAndParams(sql, params = []) {
     .replace(/\bNULLS\s+FIRST\b/gi, '')
     .replace(/NOW\(\)\s*-\s*INTERVAL\s*'(\d+)\s*hours'/gi, 'NOW() - INTERVAL $1 HOUR')
     .replace(/INTERVAL\s*'(\d+)\s*days'/gi, 'INTERVAL $1 DAY')
-    .replace(/RETURNING\s+\*/gi, '')
+    .replace(/\bRETURNING\b[\s\S]*?(?=;|\)|$)/gi, '')
     .replace(/ON\s+CONFLICT\s*(\([^)]*\))?\s*DO\s+NOTHING/gi, 'ON DUPLICATE KEY UPDATE id=id')
     .replace(/gen_random_uuid\(\)/gi, 'UUID()');
 
@@ -66,9 +66,24 @@ const db = {
     try {
       const [results, fields] = await pool.query(formattedSql, formattedParams);
       if (Array.isArray(results)) {
+        // Map common MySQL aggregate column names to uniform property names
+        const normalizedRows = results.map((row) => {
+          if (row && typeof row === 'object') {
+            for (const key of Object.keys(row)) {
+              if (/^COUNT\(/i.test(key) && !('count' in row)) {
+                row.count = row[key];
+              }
+              if (/^COALESCE\(SUM\(/i.test(key) && !('total' in row) && !('sum' in row)) {
+                row.total = row[key];
+              }
+            }
+          }
+          return row;
+        });
+
         return {
-          rows: results,
-          rowCount: results.length,
+          rows: normalizedRows,
+          rowCount: normalizedRows.length,
           fields
         };
       }

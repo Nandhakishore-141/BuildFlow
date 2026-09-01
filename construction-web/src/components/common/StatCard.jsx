@@ -21,7 +21,7 @@ export const StatCard = ({ title, value, icon: Icon, trend, trendValue, color = 
         )}
       </div>
       <div className="flex items-end gap-3 mt-auto">
-        <span className="text-2xl font-bold text-neutral-900 tracking-tight">{value}</span>
+        <span className="text-2xl font-bold text-neutral-900 tracking-tight">{value ?? 0}</span>
         {trend && (
           <span className={cn(
             "text-xs font-semibold mb-1 flex items-center",

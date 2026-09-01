@@ -2,12 +2,12 @@ import pool from '../config/db.js';
 
 class AdminRepository {
   async getDashboardStats() {
-    const usersCount = await pool.query('SELECT COUNT(*) FROM users');
-    const activeProjects = await pool.query("SELECT COUNT(*) FROM projects WHERE status = 'In Progress'");
-    const completedProjects = await pool.query("SELECT COUNT(*) FROM projects WHERE status = 'Completed'");
-    const verifiedContractors = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'Contractor' AND is_verified = true");
-    const pendingContractors = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'Contractor' AND is_verified = false");
-    const workersAssigned = await pool.query('SELECT COUNT(DISTINCT worker_id) FROM project_members');
+    const usersCount = await pool.query('SELECT COUNT(*) as count FROM users');
+    const activeProjects = await pool.query("SELECT COUNT(*) as count FROM projects WHERE status = 'In Progress'");
+    const completedProjects = await pool.query("SELECT COUNT(*) as count FROM projects WHERE status = 'Completed'");
+    const verifiedContractors = await pool.query("SELECT COUNT(*) as count FROM users WHERE role = 'Contractor' AND is_verified = true");
+    const pendingContractors = await pool.query("SELECT COUNT(*) as count FROM users WHERE role = 'Contractor' AND is_verified = false");
+    const workersAssigned = await pool.query('SELECT COUNT(DISTINCT worker_id) as count FROM project_members');
     const totalBudgetRes = await pool.query('SELECT COALESCE(SUM(budget), 0) as total FROM projects');
     const totalExpensesRes = await pool.query('SELECT COALESCE(SUM(amount), 0) as total FROM expenses');
 
@@ -29,16 +29,16 @@ class AdminRepository {
     `);
 
     return {
-      totalUsers: parseInt(usersCount.rows[0].count, 10),
-      activeProjects: parseInt(activeProjects.rows[0].count, 10),
-      completedProjects: parseInt(completedProjects.rows[0].count, 10),
-      verifiedContractors: parseInt(verifiedContractors.rows[0].count, 10),
-      pendingContractors: parseInt(pendingContractors.rows[0].count, 10),
-      workersAssignedToday: parseInt(workersAssigned.rows[0].count, 10),
-      totalBudget: parseFloat(totalBudgetRes.rows[0].total),
-      totalExpenses: parseFloat(totalExpensesRes.rows[0].total),
-      recentRegistrations: recentRegistrations.rows,
-      recentProjects: recentProjects.rows
+      totalUsers: parseInt(usersCount.rows[0]?.count ?? usersCount.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      activeProjects: parseInt(activeProjects.rows[0]?.count ?? activeProjects.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      completedProjects: parseInt(completedProjects.rows[0]?.count ?? completedProjects.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      verifiedContractors: parseInt(verifiedContractors.rows[0]?.count ?? verifiedContractors.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      pendingContractors: parseInt(pendingContractors.rows[0]?.count ?? pendingContractors.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      workersAssignedToday: parseInt(workersAssigned.rows[0]?.count ?? workersAssigned.rows[0]?.['COUNT(DISTINCT worker_id)'] ?? 0, 10) || 0,
+      totalBudget: parseFloat(totalBudgetRes.rows[0]?.total ?? 0) || 0,
+      totalExpenses: parseFloat(totalExpensesRes.rows[0]?.total ?? 0) || 0,
+      recentRegistrations: recentRegistrations.rows || [],
+      recentProjects: recentProjects.rows || []
     };
   }
 
@@ -94,8 +94,8 @@ class AdminRepository {
       paramIdx++;
     }
 
-    const countRes = await pool.query(`SELECT COUNT(*) ${baseQuery}`, params);
-    const total = parseInt(countRes.rows[0].count, 10);
+    const countRes = await pool.query(`SELECT COUNT(*) as count ${baseQuery}`, params);
+    const total = parseInt(countRes.rows[0]?.count ?? countRes.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0;
     const totalPages = Math.ceil(total / limit) || 1;
 
     const selectQuery = `
@@ -123,19 +123,19 @@ class AdminRepository {
   }
 
   async getAnalytics() {
-    const usersCount = await pool.query('SELECT COUNT(*) FROM users');
-    const contractors = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'Contractor'");
-    const homeowners = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'Homeowner'");
-    const workers = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'Worker'");
+    const usersCount = await pool.query('SELECT COUNT(*) as count FROM users');
+    const contractors = await pool.query("SELECT COUNT(*) as count FROM users WHERE role = 'Contractor'");
+    const homeowners = await pool.query("SELECT COUNT(*) as count FROM users WHERE role = 'Homeowner'");
+    const workers = await pool.query("SELECT COUNT(*) as count FROM users WHERE role = 'Worker'");
     
-    const activeProjects = await pool.query("SELECT COUNT(*) FROM projects WHERE status = 'In Progress'");
-    const completedProjects = await pool.query("SELECT COUNT(*) FROM projects WHERE status = 'Completed'");
-    const planningProjects = await pool.query("SELECT COUNT(*) FROM projects WHERE status = 'Planning'");
-    const suspendedProjects = await pool.query("SELECT COUNT(*) FROM projects WHERE status = 'Suspended'");
+    const activeProjects = await pool.query("SELECT COUNT(*) as count FROM projects WHERE status = 'In Progress'");
+    const completedProjects = await pool.query("SELECT COUNT(*) as count FROM projects WHERE status = 'Completed'");
+    const planningProjects = await pool.query("SELECT COUNT(*) as count FROM projects WHERE status = 'Planning'");
+    const suspendedProjects = await pool.query("SELECT COUNT(*) as count FROM projects WHERE status = 'Suspended'");
     
     const totalBudget = await pool.query('SELECT COALESCE(SUM(budget), 0) as total FROM projects');
     const totalExpenses = await pool.query('SELECT COALESCE(SUM(amount), 0) as total FROM expenses');
-    const materialsLowStock = await pool.query("SELECT COUNT(*) FROM materials WHERE quantity < 50 OR status = 'Ordered'");
+    const materialsLowStock = await pool.query("SELECT COUNT(*) as count FROM materials WHERE quantity < 50 OR status = 'Ordered'");
     const attendanceToday = await pool.query('SELECT COUNT(DISTINCT worker_id) as count FROM attendance WHERE DATE(clock_in) = CURRENT_DATE OR clock_in >= NOW() - INTERVAL 24 HOUR');
     const pendingNotifications = await pool.query('SELECT COUNT(*) as count FROM notifications WHERE is_read = false');
     
@@ -159,22 +159,22 @@ class AdminRepository {
     `);
 
     return {
-      totalUsers: parseInt(usersCount.rows[0].count, 10),
-      contractorsCount: parseInt(contractors.rows[0].count, 10),
-      homeownersCount: parseInt(homeowners.rows[0].count, 10),
-      workersCount: parseInt(workers.rows[0].count, 10),
-      activeProjects: parseInt(activeProjects.rows[0].count, 10),
-      completedProjects: parseInt(completedProjects.rows[0].count, 10),
-      planningProjects: parseInt(planningProjects.rows[0].count, 10),
-      suspendedProjects: parseInt(suspendedProjects.rows[0].count, 10),
-      totalBudget: parseFloat(totalBudget.rows[0].total),
-      totalExpenses: parseFloat(totalExpenses.rows[0].total),
-      materialsLowInStock: parseInt(materialsLowStock.rows[0].count, 10),
-      attendanceToday: parseInt(attendanceToday.rows[0].count, 10),
-      pendingNotifications: parseInt(pendingNotifications.rows[0].count, 10),
-      recentRegistrations: recentRegistrations.rows,
-      expensesByCategory: expensesByCategory.rows.map(r => ({ category: r.category, total_amount: parseFloat(r.total_amount), count: parseInt(r.count, 10) })),
-      projectsByStatus: projectsByStatus.rows.map(r => ({ status: r.status, count: parseInt(r.count, 10) }))
+      totalUsers: parseInt(usersCount.rows[0]?.count ?? usersCount.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      contractorsCount: parseInt(contractors.rows[0]?.count ?? contractors.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      homeownersCount: parseInt(homeowners.rows[0]?.count ?? homeowners.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      workersCount: parseInt(workers.rows[0]?.count ?? workers.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      activeProjects: parseInt(activeProjects.rows[0]?.count ?? activeProjects.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      completedProjects: parseInt(completedProjects.rows[0]?.count ?? completedProjects.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      planningProjects: parseInt(planningProjects.rows[0]?.count ?? planningProjects.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      suspendedProjects: parseInt(suspendedProjects.rows[0]?.count ?? suspendedProjects.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      totalBudget: parseFloat(totalBudget.rows[0]?.total ?? 0) || 0,
+      totalExpenses: parseFloat(totalExpenses.rows[0]?.total ?? 0) || 0,
+      materialsLowInStock: parseInt(materialsLowStock.rows[0]?.count ?? materialsLowStock.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      attendanceToday: parseInt(attendanceToday.rows[0]?.count ?? attendanceToday.rows[0]?.['COUNT(DISTINCT worker_id)'] ?? 0, 10) || 0,
+      pendingNotifications: parseInt(pendingNotifications.rows[0]?.count ?? pendingNotifications.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0,
+      recentRegistrations: recentRegistrations.rows || [],
+      expensesByCategory: (expensesByCategory.rows || []).map(r => ({ category: r.category, total_amount: parseFloat(r.total_amount || 0), count: parseInt(r.count || 0, 10) })),
+      projectsByStatus: (projectsByStatus.rows || []).map(r => ({ status: r.status, count: parseInt(r.count || 0, 10) }))
     };
   }
 
@@ -297,9 +297,10 @@ class AdminRepository {
   }
 
   async updateUserStatus(id, is_verified) {
-    const query = `UPDATE users SET is_verified = $1 WHERE id = $2 RETURNING id, is_verified`;
-    const res = await pool.query(query, [is_verified, id]);
-    return res.rows[0];
+    const query = `UPDATE users SET is_verified = $1 WHERE id = $2`;
+    await pool.query(query, [is_verified ? true : false, id]);
+    const res = await pool.query(`SELECT id, name, email, role, phone, company_name, is_verified, created_at FROM users WHERE id = $1`, [id]);
+    return res.rows[0] || { id, is_verified: is_verified ? 1 : 0 };
   }
 }
 

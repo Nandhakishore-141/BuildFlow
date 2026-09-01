@@ -122,7 +122,7 @@ const buildListQuery = (baseQuery, baseParams, filters) => {
   }
 
   const queryWithFilters = baseQuery + conditions;
-  const countQuery = `SELECT COUNT(*) FROM (${queryWithFilters}) AS count_query;`;
+  const countQuery = `SELECT COUNT(*) as count FROM (${queryWithFilters}) AS count_query;`;
   
   const page = parseInt(filters.page, 10) || 1;
   const limit = parseInt(filters.limit, 10) || 10;
@@ -148,7 +148,7 @@ export const findProjectsByContractor = async (contractorId, filters = {}) => {
   `;
   const { paginatedQuery, countQuery, params, countParams, page, limit } = buildListQuery(baseQuery, [contractorId], filters);
   const [data, count] = await Promise.all([db.query(paginatedQuery, params), db.query(countQuery, countParams)]);
-  return { data: data.rows, total: parseInt(count.rows[0].count, 10), page, limit };
+  return { data: data.rows, total: parseInt(count.rows[0]?.count ?? count.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0, page, limit };
 };
 
 export const findProjectsByOwner = async (ownerId, filters = {}) => {
@@ -160,7 +160,7 @@ export const findProjectsByOwner = async (ownerId, filters = {}) => {
   `;
   const { paginatedQuery, countQuery, params, countParams, page, limit } = buildListQuery(baseQuery, [ownerId], filters);
   const [data, count] = await Promise.all([db.query(paginatedQuery, params), db.query(countQuery, countParams)]);
-  return { data: data.rows, total: parseInt(count.rows[0].count, 10), page, limit };
+  return { data: data.rows, total: parseInt(count.rows[0]?.count ?? count.rows[0]?.['COUNT(*)'] ?? 0, 10) || 0, page, limit };
 };
 
 export const findProjectsByWorker = async (workerId, filters = {}) => {

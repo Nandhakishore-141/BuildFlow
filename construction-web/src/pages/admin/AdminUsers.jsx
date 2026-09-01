@@ -44,7 +44,8 @@ const AdminUsersContent = () => {
   }, [fetchUsers]);
 
   const handleStatusChange = async (id, currentStatus) => {
-    const newStatus = currentStatus ? 'Suspended' : 'Active';
+    const isActive = Boolean(currentStatus);
+    const newStatus = isActive ? 'Suspended' : 'Active';
     if (window.confirm(`Are you sure you want to change user status to ${newStatus}?`)) {
       try {
         await adminService.updateUserStatus(id, newStatus);
@@ -157,8 +158,8 @@ const AdminUsersContent = () => {
                       {u.company_name || u.phone || 'N/A'}
                     </td>
                     <td className="p-4">
-                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${u.is_verified ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-rose-100 text-rose-800 border-rose-200'}`}>
-                        {u.is_verified ? 'Active' : 'Suspended'}
+                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${Boolean(u.is_verified) ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-rose-100 text-rose-800 border-rose-200'}`}>
+                        {Boolean(u.is_verified) ? 'Active' : 'Suspended'}
                       </span>
                     </td>
                     <td className="p-4 text-right">
@@ -179,9 +180,9 @@ const AdminUsersContent = () => {
                           variant="outline" 
                           size="sm" 
                           onClick={() => handleStatusChange(u.id, u.is_verified)}
-                          className={u.is_verified ? 'text-rose-600 hover:bg-rose-50 text-xs' : 'text-emerald-600 hover:bg-emerald-50 text-xs'}
+                          className={Boolean(u.is_verified) ? 'text-rose-600 hover:bg-rose-50 text-xs' : 'text-emerald-600 hover:bg-emerald-50 text-xs'}
                         >
-                          {u.is_verified ? 'Suspend' : 'Activate'}
+                          {Boolean(u.is_verified) ? 'Suspend' : 'Activate'}
                         </Button>
                       </div>
                     </td>
